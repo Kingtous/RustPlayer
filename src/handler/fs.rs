@@ -1,17 +1,17 @@
 // Copyright (C) 2022 Kingtous
-// 
+//
 // This file is part of RustPlayer.
-// 
+//
 // RustPlayer is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // RustPlayer is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -94,7 +94,11 @@ pub fn handle_fs(app: &mut App, key: KeyCode) -> bool {
     match key {
         KeyCode::Down => {
             if let Some(selected) = fse.index.selected() {
-                fse.index.select(Some(min(len, selected + 1)));
+                if selected == len {
+                    fse.index.select(Some(0));
+                } else {
+                    fse.index.select(Some(min(len, selected + 1)));
+                }
                 return true;
             } else {
                 fse.index.select(Some(0));
@@ -103,6 +107,7 @@ pub fn handle_fs(app: &mut App, key: KeyCode) -> bool {
         KeyCode::Up => {
             if let Some(selected) = fse.index.selected() {
                 if selected == 0 {
+                    fse.index.select(Some(len));
                     return true;
                 }
                 fse.index.select(Some(max(0, selected - 1)));
@@ -112,7 +117,7 @@ pub fn handle_fs(app: &mut App, key: KeyCode) -> bool {
             }
         }
         KeyCode::Right => {
-            add_media_to_player(app,false);
+            add_media_to_player(app, false);
         }
         KeyCode::Enter => {
             add_media_to_player(app, true);

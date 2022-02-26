@@ -1,17 +1,17 @@
 // Copyright (C) 2022 Kingtous
-// 
+//
 // This file is part of RustPlayer.
-// 
+//
 // RustPlayer is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // RustPlayer is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -31,11 +31,11 @@ use crossterm::{
 use failure::Error;
 use tui::{
     backend::{Backend, CrosstermBackend},
-    Frame,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Style},
-    Terminal,
-    text::{Span, Text}, widgets::{Block, Borders, BorderType, ListState, Paragraph, Widget, Wrap},
+    text::{Span, Text},
+    widgets::{Block, BorderType, Borders, ListState, Paragraph, Widget, Wrap},
+    Frame, Terminal,
 };
 
 use crate::{
@@ -45,10 +45,10 @@ use crate::{
     main,
     media::player::{MusicPlayer, Player},
     ui::{
-        EventType,
         fs::draw_fs_tree,
         help::draw_help,
         music_board::{draw_music_board, MusicController},
+        EventType,
     },
 };
 
@@ -107,7 +107,7 @@ impl App {
         execute!(stdout, EnterAlternateScreen)?;
         let backend = CrosstermBackend::new(stdout);
         let mut terminal = Terminal::new(backend)?;
-        execute!(terminal.backend_mut(), DisableMouseCapture);
+        // execute!(terminal.backend_mut(), EnableMouseCapture);
         enable_raw_mode()?;
         terminal.hide_cursor()?;
         self.draw_frame(&mut terminal)?;
@@ -133,12 +133,9 @@ impl App {
                         },
                         InputMode::Editing => {}
                     }
-                } else {
-                    thread::sleep(self.config.refresh_rate);
                 }
-            } else {
-                thread::sleep(self.config.refresh_rate);
             }
+            thread::sleep(self.config.refresh_rate);
             // 10 fps
             self.draw_frame(&mut terminal)?;
             if let Ok(event) = rd.try_recv() {
@@ -183,7 +180,7 @@ impl App {
                 }
                 Routes::Help => {
                     self.draw_header(frame, chunks[0]);
-                    draw_help(self,frame, chunks[1]);
+                    draw_help(self, frame, chunks[1]);
                 }
             }
         })?;
