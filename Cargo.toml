@@ -1,0 +1,19 @@
+[package]
+name = "RustPlayer"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rand = "0.8.5"
+
+tui = "0.17.0"
+crossterm = "0.23.0"
+
+rodio = "0.15.0"
+mp3-duration = "0.1.10"
+
+failure = "0.1.8"
+
+open = "2.1.0"
