@@ -17,5 +17,5 @@ jobs:
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
-    - run: sudo apt-get -y install libasound2-dev
+    - run: sudo apt install -y libasound2-dev
     - run: cargo build --release
