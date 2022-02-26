@@ -1,3 +1,57 @@
+// Copyright (C) 2022 Kingtous
+// 
+// This file is part of RustPlayer.
+// 
+// RustPlayer is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// RustPlayer is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
+
+use std::{
+    io::{stdout, Stdout},
+    sync::mpsc,
+    thread::{self, sleep_ms},
+    time::{self, Duration, SystemTime},
+    vec,
+};
+
+use crossterm::{
+    event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
+    execute,
+    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+};
+use failure::Error;
+use tui::{
+    backend::{Backend, CrosstermBackend},
+    Frame,
+    layout::{Alignment, Constraint, Direction, Layout, Rect},
+    style::{Color, Style},
+    Terminal,
+    text::{Span, Text}, widgets::{Block, Borders, BorderType, ListState, Paragraph, Widget, Wrap},
+};
+
+use crate::{
+    config::Config,
+    fs::FsExplorer,
+    handler::handle_keyboard_event,
+    main,
+    media::player::{MusicPlayer, Player},
+    ui::{
+        EventType,
+        fs::draw_fs_tree,
+        help::draw_help,
+        music_board::{draw_music_board, MusicController},
+    },
+};
+
 pub enum InputMode {
     Normal,
     Editing,
@@ -14,41 +68,6 @@ pub enum ActiveModules {
     Fs,
     MusicController,
 }
-
-use crate::{
-    config::Config,
-    fs::FsExplorer,
-    handler::handle_keyboard_event,
-    main,
-    media::player::{MusicPlayer, Player},
-    ui::{
-        fs::draw_fs_tree,
-        help::draw_help,
-        music_board::{draw_music_board, MusicController},
-        EventType,
-    },
-};
-use crossterm::{
-    event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
-    execute,
-    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
-};
-use failure::Error;
-use std::{
-    io::{stdout, Stdout},
-    sync::mpsc,
-    thread::{self, sleep_ms},
-    time::{self, Duration, SystemTime},
-    vec,
-};
-use tui::{
-    backend::{Backend, CrosstermBackend},
-    layout::{Alignment, Constraint, Direction, Layout, Rect},
-    style::{Color, Style},
-    text::{Span, Text},
-    widgets::{Block, BorderType, Borders, ListState, Paragraph, Widget, Wrap},
-    Frame, Terminal,
-};
 
 pub struct App {
     pub mode: InputMode,

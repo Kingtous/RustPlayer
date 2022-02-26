@@ -1,18 +1,37 @@
-use crate::App;
-use crate::app::ActiveModules;
-use crossterm::style::Colors;
-use failure::{Error, Fail};
+// Copyright (C) 2022 Kingtous
+// 
+// This file is part of RustPlayer.
+// 
+// RustPlayer is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// RustPlayer is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
+
+use std::{fs, os};
 use std::env::current_dir;
 use std::fmt::{Debug, Display, Formatter};
 use std::fs::{DirEntry, ReadDir};
 use std::path::Path;
-use std::{fs, os};
+
+use crossterm::style::Colors;
+use failure::{Error, Fail};
 use tui::backend::Backend;
+use tui::Frame;
 use tui::layout::{Alignment, Constraint, Direction, Layout, Rect};
 use tui::style::{Color, Style};
 use tui::text::Text;
-use tui::widgets::{Block, Borders, List, ListItem, ListState, Paragraph, Widget, Wrap, BorderType};
-use tui::Frame;
+use tui::widgets::{Block, Borders, BorderType, List, ListItem, ListState, Paragraph, Widget, Wrap};
+
+use crate::App;
+use crate::app::ActiveModules;
 
 pub struct FsExplorer {
     pub current_path: String,

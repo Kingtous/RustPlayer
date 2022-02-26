@@ -2,11 +2,11 @@
 
 An local audio player using completely terminal gui.
 
-## screenshot
+## Screenshot
 
 ![](https://img.kingtous.cn/QQ%E6%88%AA%E5%9B%BE20220226203558.png)
 
-## features
+## Features
 
 - Low CPU and memory usage
 - File Explorer

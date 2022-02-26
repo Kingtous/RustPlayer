@@ -1,15 +1,32 @@
+// Copyright (C) 2022 Kingtous
+// 
+// This file is part of RustPlayer.
+// 
+// RustPlayer is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// RustPlayer is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
+
 use std::vec;
 
+use rand::Rng;
 use tui::{
     backend::Backend,
+    Frame,
     layout::{self, Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
-    widgets::{BarChart, Block, BorderType, Borders, Paragraph, Row, Table},
-    Frame,
+    widgets::{BarChart, Block, Borders, BorderType, Paragraph, Row, Table},
 };
 
 use crate::{app::App, media::player::Player};
-use rand::Rng;
 
 pub fn draw_help<B>(app: &mut App, frame: &mut Frame<B>, area: Rect)
 where
