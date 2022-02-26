@@ -59,7 +59,7 @@ where
         .gauge_style(
             Style::default()
                 .bg(Color::DarkGray)
-                .fg(Color::LightBlue)
+                .fg(Color::Cyan)
                 .add_modifier(Modifier::BOLD),
         );
     let layout = Layout::default()
