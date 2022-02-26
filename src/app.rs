@@ -124,7 +124,7 @@ impl App {
                 if let Event::Key(key) = event::read()? {
                     match self.mode {
                         InputMode::Normal => match key.code {
-                            KeyCode::Char('q') => {
+                            KeyCode::Char('q') | KeyCode::Char('Q') => {
                                 break;
                             }
                             code => {

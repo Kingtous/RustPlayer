@@ -1,17 +1,17 @@
 // Copyright (C) 2022 Kingtous
-// 
+//
 // This file is part of RustPlayer.
-// 
+//
 // RustPlayer is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // RustPlayer is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -44,6 +44,7 @@ pub struct PlayListItem {
     pub duration: Duration,
     pub current_pos: Duration,
     pub status: PlayStatus,
+    pub path: String,
 }
 
 pub struct PlayList {
@@ -113,9 +114,7 @@ impl Player for MusicPlayer {
 
     fn add_to_list(&mut self, media: Media, once: bool) -> bool {
         match media.src {
-            super::media::Source::Http(_) => {
-                false
-            }
+            super::media::Source::Http(_) => false,
             super::media::Source::Local(path) => {
                 match File::open(path.as_str()) {
                     Ok(f) => {
@@ -124,38 +123,27 @@ impl Player for MusicPlayer {
                         // Result<(stream,streamHanlde),std::error:Error>
                         let mp3d = mp3_duration::from_file(&f).ok();
                         if let Some(duration) = mp3d {
-                            let buf_reader = BufReader::new(f);
-                            match Decoder::new(buf_reader) {
-                                Ok(dec) => {
-                                    if !self.initialized {
-                                        self.initialized = true;
-                                        self.start_listening_thread();
-                                    }
-                                    if once {
-                                        self._sink.stop();
-                                        self._sink = Sink::try_new(&self._stream_handle).unwrap();
-                                        self.play_list.lists.clear();
-                                    }
-
-                                    self._sink.append(dec);
-
-                                    // add to playlist
-                                    self.play_list.lists.push(PlayListItem {
-                                        name: file_name,
-                                        duration: duration,
-                                        current_pos: Duration::from_secs(0),
-                                        status: PlayStatus::Waiting,
-                                    });
-                                    // start play
-                                    self.play();
-                                    // manually tick once
-                                    self.tick();
-                                    return true;
-                                }
-                                Err(_) => {
-                                    return false;
-                                }
+                            if once || self.play_list.lists.is_empty() {
+                                // rebuild
+                                self.stop();
+                                let buf_reader = BufReader::new(f);
+                                let sink = self._stream_handle.play_once(buf_reader).unwrap();
+                                self._sink = sink;
+                                self.play_list.lists.clear();
                             }
+                            self.play_list.lists.push(PlayListItem {
+                                name: file_name,
+                                duration: duration,
+                                current_pos: Duration::from_secs(0),
+                                status: PlayStatus::Waiting,
+                                path: path.to_string_lossy().to_string(),
+                            });
+                            if !self.initialized {
+                                self.initialized = true;
+                            }
+                            self.play();
+                            self.tick();
+                            return true;
                         } else {
                             return false;
                         }
@@ -245,7 +233,7 @@ impl Player for MusicPlayer {
                     let now = instant.elapsed().add(duration.clone());
                     if now.ge(&song.duration) {
                         // next song, delete 0
-                        self.play_list.lists.remove(0);
+                        self.next();
                     } else {
                         // update status
                         self.current_time = now;
@@ -267,9 +255,21 @@ impl Player for MusicPlayer {
 
     fn next(&mut self) -> bool {
         let len = self.play_list.lists.len();
-        if len > 1 {
-            self.stop();
+        if len >= 1 {
             self.play_list.lists.remove(0);
+            self.stop();
+            if !self.play_list.lists.is_empty() {
+                // next song
+                let top_music = self.play_list.lists.first().unwrap();
+                let f = File::open(top_music.path.as_str()).unwrap();
+                let buf_reader = BufReader::new(f);
+                let (stream, stream_handle) = OutputStream::try_default().unwrap();
+                self._stream = stream;
+                self._stream_handle = stream_handle;
+                self._sink = Sink::try_new(&self._stream_handle).unwrap();
+                self._sink.append(Decoder::new(buf_reader).unwrap());
+                self.play();
+            }
             // for
         } else {
             // no more sound to play
@@ -291,16 +291,6 @@ impl MusicPlayer {
 
     pub fn playing_song(&self) -> Option<&PlayListItem> {
         return self.play_list.lists.first();
-    }
-
-    fn start_listening_thread(&mut self) {
-        // let mutex = Mutex::new(self);
-        // let arc = Arc::new(mutex);
-
-        // let thread_arc = arc.clone();
-        // thread::spawn(move || loop {
-        //     if let Ok(mp) = thread_arc.lock() {}
-        // });
     }
 }
 

@@ -46,7 +46,7 @@ pub fn handle_active_modules(app: &mut App, key: KeyCode) -> bool {
 
 pub fn handle_routes(app: &mut App, key: KeyCode) -> bool {
     match key {
-        KeyCode::Char('h') => {
+        KeyCode::Char('h') | KeyCode::Char('H') => {
             if let Some(page) = app.route_stack.last() {
                 match page {
                     Routes::Main => {

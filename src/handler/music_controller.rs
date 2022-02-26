@@ -22,18 +22,21 @@ use crossterm::event::KeyCode;
 use crate::{app::{ActiveModules, App}, media::player::Player};
 
 pub fn handle_music_controller(app: &mut App, code: KeyCode) -> bool {
-    if app.active_modules != ActiveModules::MusicController {
-        return false;
-    }
-    // let mc = &app.music_controller;
+    // if app.active_modules != ActiveModules::MusicController {
+    //     return false;
+    // }
     let player = &mut app.player;
     match code {
-        KeyCode::Char('s') => {
+        KeyCode::Char('s') | KeyCode::Char('S') => {
             if player.is_playing() {
                 player.pause();
             } else {
                 player.resume();
             }
+            return true;
+        }
+        KeyCode::Char('n') | KeyCode::Char('N') => {
+            player.next();
             return true;
         }
         _ => {return false;}

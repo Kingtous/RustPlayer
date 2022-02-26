@@ -49,6 +49,7 @@ where
         Row::new(["Enter","play audio immediately and clean play list or enter selected folder."]),
         Row::new(["-/+","decrease/increase volume."]),
         Row::new(["s","pause/resume audio playback."]),
+        Row::new(["n","play the next audio."]),
         Row::new(["q","quit RustPlayer."]),
         Row::new(["↑/↓","change selected index."]),
     ])

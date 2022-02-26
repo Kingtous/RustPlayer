@@ -20,10 +20,10 @@ use tui::{
     Frame,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
-    symbols::{self, line::Set},
-    text::{Span, Spans, Text}, widgets::{
-        Block, Borders, BorderType, canvas::Line, Gauge, LineGauge, List, ListItem, ListState,
-        Paragraph, Table,
+    symbols::{self},
+    text::{Spans}, widgets::{
+        Block, Borders, BorderType, LineGauge, ListState,
+        Paragraph,
     },
 };
 
@@ -100,12 +100,12 @@ where
     frame.render_widget(text, sub_layout[0]);
     frame.render_widget(bar, sub_layout[1]);
     let mut p = Paragraph::new(vec![
-        Spans::from("▶(s) EXT(q) SWH(Tab) HLP(h)"),
+        Spans::from("▶(s) >>|(n) EXT(q) HLP(h)"),
     ]).style(Style::default())
     .alignment(Alignment::Center);
     if player.is_playing() {
         p = Paragraph::new(vec![
-            Spans::from("||(s) EXT(q) SWH(Tab) HELP(h)"),
+            Spans::from("||(s) >>|(n) EXT(q) HELP(h)"),
         ])
         .alignment(Alignment::Center);
     }
