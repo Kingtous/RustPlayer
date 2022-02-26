@@ -1,5 +1,7 @@
 # RustPlayer
 
+![build status](https://github.com/Kingtous/RustPlayer/actions/workflows/rust.yml/badge.svg)
+
 An local audio player using completely terminal gui.
 
 ## Screenshot
