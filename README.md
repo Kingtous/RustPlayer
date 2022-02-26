@@ -11,10 +11,11 @@ An local audio player using completely terminal gui.
 ## Features
 
 - Low CPU and memory usage
-- File Explorer
+- File explorer
 - Playlist playback supported
-- Wave Animation
+- Wave animation
 - Playback progress
+- Next audio
 - Adjust volume
 - Developed by Kingtous
 
