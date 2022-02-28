@@ -8,6 +8,10 @@ An local audio player using completely terminal gui.
 
 ![](https://img.kingtous.cn/QQ%E6%88%AA%E5%9B%BE20220226203558.png)
 
+## Demo Video
+
+- [Bilibili Video](https://www.bilibili.com/video/BV1T34y1k7Xf)
+
 ## Features
 
 - Low CPU and memory usage
