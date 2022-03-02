@@ -229,4 +229,8 @@ impl App {
         }
         Ok(())
     }
+
+    pub fn set_msg(&mut self,msg: &str) {
+        self.msg = String::from(msg);
+    }
 }

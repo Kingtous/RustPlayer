@@ -14,6 +14,7 @@ An local audio player using completely terminal gui.
 
 ## Features
 
+- Support mp3, wav, flac format
 - Low CPU and memory usage
 - File explorer
 - Playlist playback supported

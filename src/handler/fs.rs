@@ -61,12 +61,19 @@ fn add_media_to_player(app: &mut App, once: bool) -> bool {
         } else {
             // 文件
             let entry = &fse.files[selected - fse.dirs.len() - 1];
-            app.player.add_to_list(
+            let res = app.player.add_to_list(
                 Media {
                     src: Source::Local(entry.file_name().to_string_lossy().to_string()),
                 },
                 once,
             );
+            if !res {
+                let msg = format!("Open failed: {}",entry.file_name().to_str().unwrap());
+                app.set_msg(&msg);
+            } else {
+                let msg = format!("Start playing");
+                app.set_msg(&msg);
+            }
         }
         return true;
     } else {

@@ -30,6 +30,8 @@ use std::{
 
 use rodio::{Decoder, OutputStream, OutputStreamHandle, Sink, Source};
 
+use crate::app;
+
 use super::media::Media;
 
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
@@ -116,37 +118,55 @@ impl Player for MusicPlayer {
         match media.src {
             super::media::Source::Http(_) => false,
             super::media::Source::Local(path) => {
+                let duration: Duration;
+                if path.ends_with(".mp3") {
+                    let dur = mp3_duration::from_path(path.clone());
+                    if let Ok(dur) = dur {
+                        duration = dur;
+                    } else {return false;}
+                } else {
+                    if let Ok(f) = File::open(path.as_str()) {
+                        let dec = Decoder::new(f);
+                        if let Ok(dec) = dec {
+                            if let Some(dur) = dec.total_duration() {
+                                duration = dur;
+                            } else {
+                                return false;
+                            }
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                }
+                // open
                 match File::open(path.as_str()) {
                     Ok(f) => {
                         let path = Path::new(path.as_str());
                         let file_name = path.file_name().unwrap().to_string_lossy().to_string();
                         // Result<(stream,streamHanlde),std::error:Error>
-                        let mp3d = mp3_duration::from_file(&f).ok();
-                        if let Some(duration) = mp3d {
-                            if once || self.play_list.lists.is_empty() {
-                                // rebuild
-                                self.stop();
-                                let buf_reader = BufReader::new(f);
-                                let sink = self._stream_handle.play_once(buf_reader).unwrap();
-                                self._sink = sink;
-                                self.play_list.lists.clear();
-                            }
-                            self.play_list.lists.push(PlayListItem {
-                                name: file_name,
-                                duration: duration,
-                                current_pos: Duration::from_secs(0),
-                                status: PlayStatus::Waiting,
-                                path: path.to_string_lossy().to_string(),
-                            });
-                            if !self.initialized {
-                                self.initialized = true;
-                            }
-                            self.play();
-                            self.tick();
-                            return true;
-                        } else {
-                            return false;
+                        if once || self.play_list.lists.is_empty() {
+                            // rebuild
+                            self.stop();
+                            let buf_reader = BufReader::new(f);
+                            let sink = self._stream_handle.play_once(buf_reader).unwrap();
+                            self._sink = sink;
+                            self.play_list.lists.clear();
                         }
+                        self.play_list.lists.push(PlayListItem {
+                            name: file_name,
+                            duration: duration,
+                            current_pos: Duration::from_secs(0),
+                            status: PlayStatus::Waiting,
+                            path: path.to_string_lossy().to_string(),
+                        });
+                        if !self.initialized {
+                            self.initialized = true;
+                        }
+                        self.play();
+                        self.tick();
+                        return true;
                     }
                     Err(_) => false,
                 }
