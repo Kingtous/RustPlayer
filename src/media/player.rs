@@ -28,7 +28,8 @@ use std::{
     time::{Duration, Instant},
 };
 
-use rodio::{Decoder, OutputStream, OutputStreamHandle, Sink, Source};
+use rodio::{Decoder, OutputStream, OutputStreamHandle, Sink, Source, Devices};
+use rodio::cpal;
 
 use crate::app;
 
@@ -100,6 +101,9 @@ pub struct MusicPlayer {
 
 impl Player for MusicPlayer {
     fn new() -> Self {
+        for dev in cpal::available_hosts() {
+            println!("{:?}",dev);
+        }
         let (stream, stream_handle) = OutputStream::try_default().unwrap();
         let sink = Sink::try_new(&stream_handle).unwrap();
         Self {
@@ -121,9 +125,18 @@ impl Player for MusicPlayer {
                 let duration: Duration;
                 if path.ends_with(".mp3") {
                     let dur = mp3_duration::from_path(path.clone());
-                    if let Ok(dur) = dur {
-                        duration = dur;
-                    } else {return false;}
+                    match dur {
+                        Ok(dur) => {
+                            duration = dur;
+                        },
+                        Err(err) => {
+                            // EOF catch
+                            duration = err.at_duration;
+                            if duration.is_zero() {
+                                return false;
+                            }
+                        },
+                    }
                 } else {
                     if let Ok(f) = File::open(path.as_str()) {
                         let dec = Decoder::new(f);
