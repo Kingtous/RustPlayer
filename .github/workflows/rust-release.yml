@@ -3,7 +3,7 @@ name: Rust Build, bump tag version and release
 on:
   push:
     tags:
-      - '*'
+      - 'v*.*.*'
 
 jobs:
   publish:
