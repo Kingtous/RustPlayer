@@ -11,10 +11,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04,windows-latest,macOS-latest]
+        os: [ubuntu-16.04,windows-latest,macOS-latest]
         include:
           - name: linux
-            os: ubuntu-18.04
+            os: ubuntu-16.04
             artifact_name: target/release/RustPlayer
             asset_name: RustPlayer-linux
           - name: windows
@@ -35,7 +35,7 @@ jobs:
         toolchain: stable
       
     - name: Install libasound2-dev for Linux
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-16.04'
       run: sudo apt install -y libasound2-dev
 
     - name: Build
