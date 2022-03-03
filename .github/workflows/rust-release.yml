@@ -15,16 +15,16 @@ jobs:
         include:
           - name: linux
             os: ubuntu-latest
-            artifact_name: target/release/<name>
-            asset_name: <name>-linux
+            artifact_name: target/release/RustPlayer
+            asset_name: RustPlayer-linux
           - name: windows
             os: windows-latest
-            artifact_name: target/release/<name>.exe
-            asset_name: <name>-windows
+            artifact_name: target/release/RustPlayer.exe
+            asset_name: RustPlayer-windows.exe
           - name: macos
             os: macos-latest
-            artifact_name: target/release/<name>
-            asset_name: <name>-macos
+            artifact_name: target/release/RustPlayer
+            asset_name: RustPlayer-macos
 
     steps:
     - uses: actions/checkout@v1
