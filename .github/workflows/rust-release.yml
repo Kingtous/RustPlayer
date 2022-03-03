@@ -1,0 +1,48 @@
+name: Rust Build, bump tag version and release
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  publish:
+    name: Publish for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04,windows-latest,macOS-latest]
+        include:
+          - name: linux
+            os: ubuntu-latest
+            artifact_name: target/release/RustPlayer
+            asset_name: RustPlayer-linux
+          - name: windows
+            os: windows-latest
+            artifact_name: target/release/RustPlayer.exe
+            asset_name: RustPlayer-windows.exe
+          - name: macos
+            os: macos-latest
+            artifact_name: target/release/RustPlayer
+            asset_name: RustPlayer-macos
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+      
+    - name: Install libasound2-dev for Linux
+      if: matrix.os == 'ubuntu-latest'
+      run: sudo apt install -y libasound2-dev
+
+    - name: Build
+      run: cargo build --release
+
+    - name: Upload binaries to release
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.asset_name }}
+        path: ${{ matrix.artifact_name }}

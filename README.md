@@ -37,8 +37,13 @@ The screenshot from Deepin
 - Adjust volume
 - Developed by Kingtous
 
+## Download Binary Release Directly and Run
 
-## Build and run
+The binary release of macOS, Linux, Windows can be found in artifacts of [RustPlayer Release Action](https://github.com/Kingtous/RustPlayer/actions/workflows/rust-release.yml). Click the top item of the list to download the latest release.
+
+## Compile RustPlayer and run
+
+If u found this binary release is not working or u like compiling RustPlayer by youselef. Yes, The step to compile RustPlayer is really easy.
 
 - clone this repo.
 - `cargo run` in root of this project.
