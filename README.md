@@ -1,6 +1,7 @@
 # RustPlayer
 
 ![build status](https://github.com/Kingtous/RustPlayer/actions/workflows/rust.yml/badge.svg)
+[![Rust Build, bump tag version and release](https://github.com/Kingtous/RustPlayer/actions/workflows/rust-release.yml/badge.svg)](https://github.com/Kingtous/RustPlayer/actions/workflows/rust-release.yml)
 
 An local audio player using completely terminal gui. MacOS, Linux, Windows are all supported.
 
