@@ -4,7 +4,7 @@
 
 An local audio player using completely terminal gui. MacOS, Linux, Windows are all supported.
 
-RustPlayer is under development. If u encountering any problem, please open issues :)
+RustPlayer is under development. If u have encountered any problem, please open issues :)
 
 ## Screenshots
 
@@ -27,6 +27,7 @@ The screenshot from Deepin
 ## Features
 
 - Support mp3, wav, flac format
+- Multi-platform supported
 - Low CPU and memory usage
 - File explorer
 - Playlist playback supported
