@@ -20,6 +20,8 @@ The screenshot from Deepin
 
 ### macOS
 
+![macOS RustPlayer](https://s2.loli.net/2022/03/03/Z9altpG63qk24W8.png)
+
 ## Demo Video
 
 - [Bilibili Video](https://www.bilibili.com/video/BV1T34y1k7Xf)
