@@ -14,7 +14,7 @@ jobs:
         os: [ubuntu-18.04,windows-latest,macOS-latest]
         include:
           - name: linux
-            os: ubuntu-latest
+            os: ubuntu-18.04
             artifact_name: target/release/RustPlayer
             asset_name: RustPlayer-linux
           - name: windows
