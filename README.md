@@ -2,11 +2,23 @@
 
 ![build status](https://github.com/Kingtous/RustPlayer/actions/workflows/rust.yml/badge.svg)
 
-An local audio player using completely terminal gui.
+An local audio player using completely terminal gui. MacOS, Linux, Windows are all supported.
 
-## Screenshot
+RustPlayer is under development. If u encountering any problem, please open issues :)
 
-![](https://img.kingtous.cn/QQ%E6%88%AA%E5%9B%BE20220226203558.png)
+## Screenshots
+
+### Windows
+
+![Windows 11](https://img.kingtous.cn/QQ%E6%88%AA%E5%9B%BE20220226203558.png)
+
+### Linux 
+
+The screenshot from Deepin
+
+![Deepin RustPlayer](https://s2.loli.net/2022/03/03/YtJWvnDuV4rHs7T.png)
+
+### macOS
 
 ## Demo Video
 
