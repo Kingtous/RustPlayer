@@ -2,8 +2,15 @@ name: Rust
 
 on:
   push:
+    paths-ignore: 
+      - 'README.md'
+      - '.github/**'
     branches: [ master ]
+    
   pull_request:
+    paths-ignore: 
+      - 'README.md'
+      - '.github/**'
     branches: [ master ]
 
 env:
