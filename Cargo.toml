@@ -17,3 +17,5 @@ mp3-duration = "0.1.10"
 failure = "0.1.8"
 
 open = "2.1.0"
+
+regex = "1.5.4"

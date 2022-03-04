@@ -15,5 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
-pub mod lyrics;
-mod event;
+include!("../src/util/lyrics.rs");
+
+#[test]
+fn test_lyrics() {
+    let lrc = Lyrics::from_music_path("assets/test.lrc");
+    assert_ne!(lrc.count(),0)
+}

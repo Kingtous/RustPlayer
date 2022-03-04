@@ -11,7 +11,9 @@ RustPlayer is under development. If u have encountered any problem, please open 
 
 ### Windows
 
-![Windows 11](https://img.kingtous.cn/QQ%E6%88%AA%E5%9B%BE20220226203558.png)
+Play with lyrics. If no lyrics found, the wave animation will be the replacement of the block. See screenshots from Linux and macOS below.
+
+![image.png](https://s2.loli.net/2022/03/04/SbK6RN7tXAym4g3.png)
 
 ### Linux 
 
@@ -30,6 +32,7 @@ The screenshot from Deepin
 ## Features
 
 - Support mp3, wav, flac format
+- Lyrics Supported
 - Multi-platform supported
 - Low CPU and memory usage
 - File explorer

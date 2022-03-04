@@ -28,10 +28,11 @@ use std::{
     time::{Duration, Instant},
 };
 
-use rodio::{Decoder, OutputStream, OutputStreamHandle, Sink, Source, Devices};
 use rodio::cpal;
+use rodio::{Decoder, Devices, OutputStream, OutputStreamHandle, Sink, Source};
+use tui::widgets::ListState;
 
-use crate::app;
+use crate::{app, util::lyrics::{Lyrics, Lyric}};
 
 use super::media::Media;
 
@@ -48,6 +49,8 @@ pub struct PlayListItem {
     pub current_pos: Duration,
     pub status: PlayStatus,
     pub path: String,
+    pub lyrics: Lyrics,
+    pub lyrics_index: ListState,
 }
 
 pub struct PlayList {
@@ -84,6 +87,12 @@ pub trait Player {
 
     // 提供一个接口，用于更新player状态
     fn tick(&mut self);
+
+    // 当前歌词
+    fn current_lyric(&self) -> &str;
+
+    // 有歌词
+    fn has_lyrics(&self) -> bool;
 }
 
 pub struct MusicPlayer {
@@ -93,16 +102,17 @@ pub struct MusicPlayer {
     pub play_list: PlayList,
     // media: Media,
     // stream
-    _stream: OutputStream,
-    _stream_handle: OutputStreamHandle,
-    _sink: Sink,
+    stream: OutputStream,
+    stream_handle: OutputStreamHandle,
+    sink: Sink,
+    current_lyric: Option<String>,
     initialized: bool,
 }
 
 impl Player for MusicPlayer {
     fn new() -> Self {
         for dev in cpal::available_hosts() {
-            println!("{:?}",dev);
+            println!("{:?}", dev);
         }
         let (stream, stream_handle) = OutputStream::try_default().unwrap();
         let sink = Sink::try_new(&stream_handle).unwrap();
@@ -111,9 +121,10 @@ impl Player for MusicPlayer {
             total_time: Duration::from_secs(0),
             play_list: PlayList { lists: vec![] },
             // media: f,
-            _stream: stream,
-            _stream_handle: stream_handle,
-            _sink: sink,
+            stream,
+            stream_handle,
+            sink,
+            current_lyric: None,
             initialized: false,
         }
     }
@@ -128,14 +139,14 @@ impl Player for MusicPlayer {
                     match dur {
                         Ok(dur) => {
                             duration = dur;
-                        },
+                        }
                         Err(err) => {
                             // EOF catch
                             duration = err.at_duration;
                             if duration.is_zero() {
                                 return false;
                             }
-                        },
+                        }
                     }
                 } else {
                     if let Ok(f) = File::open(path.as_str()) {
@@ -153,6 +164,8 @@ impl Player for MusicPlayer {
                         return false;
                     }
                 }
+                // find lyrics
+                let lyrics = Lyrics::from_music_path(path.as_str());
                 // open
                 match File::open(path.as_str()) {
                     Ok(f) => {
@@ -163,16 +176,20 @@ impl Player for MusicPlayer {
                             // rebuild
                             self.stop();
                             let buf_reader = BufReader::new(f);
-                            let sink = self._stream_handle.play_once(buf_reader).unwrap();
-                            self._sink = sink;
+                            let sink = self.stream_handle.play_once(buf_reader).unwrap();
+                            self.sink = sink;
                             self.play_list.lists.clear();
                         }
+                        let mut state =  ListState::default();
+                        state.select(Some(0));
                         self.play_list.lists.push(PlayListItem {
                             name: file_name,
                             duration: duration,
                             current_pos: Duration::from_secs(0),
                             status: PlayStatus::Waiting,
                             path: path.to_string_lossy().to_string(),
+                            lyrics: lyrics,
+                            lyrics_index: state,
                         });
                         if !self.initialized {
                             self.initialized = true;
@@ -193,7 +210,7 @@ impl Player for MusicPlayer {
     // }
 
     fn play(&mut self) -> bool {
-        self._sink.play();
+        self.sink.play();
         if let Some(item) = self.play_list.lists.first_mut() {
             let status = &mut item.status;
             match status {
@@ -210,12 +227,12 @@ impl Player for MusicPlayer {
     }
 
     fn stop(&mut self) -> bool {
-        self._sink.stop();
+        self.sink.stop();
         true
     }
 
     fn pause(&mut self) -> bool {
-        self._sink.pause();
+        self.sink.pause();
         if let Some(item) = self.play_list.lists.first_mut() {
             let status = &mut item.status;
             match status {
@@ -230,7 +247,7 @@ impl Player for MusicPlayer {
     }
 
     fn resume(&mut self) -> bool {
-        self._sink.play();
+        self.sink.play();
         if let Some(item) = self.play_list.lists.first_mut() {
             let status = &mut item.status;
             match status {
@@ -245,7 +262,7 @@ impl Player for MusicPlayer {
     }
 
     fn is_playing(&self) -> bool {
-        return self.initialized && !self._sink.is_paused() && !self.play_list.lists.is_empty();
+        return self.initialized && !self.sink.is_paused() && !self.play_list.lists.is_empty();
     }
 
     fn get_progress(&self) -> (f32, f32) {
@@ -271,6 +288,14 @@ impl Player for MusicPlayer {
                         // update status
                         self.current_time = now;
                         self.total_time = song.duration.clone();
+                        // add lyrics
+                        let selected_index = song.lyrics_index.selected().unwrap();
+                        if selected_index + 1 < song.lyrics.list.len() {
+                            let next_lyric= &song.lyrics.list[selected_index + 1]; 
+                            if self.current_time > next_lyric.time {
+                                song.lyrics_index.select(Some(selected_index + 1));
+                            }
+                        }
                     }
                 }
                 PlayStatus::Stopped(dur) => {
@@ -297,10 +322,10 @@ impl Player for MusicPlayer {
                 let f = File::open(top_music.path.as_str()).unwrap();
                 let buf_reader = BufReader::new(f);
                 let (stream, stream_handle) = OutputStream::try_default().unwrap();
-                self._stream = stream;
-                self._stream_handle = stream_handle;
-                self._sink = Sink::try_new(&self._stream_handle).unwrap();
-                self._sink.append(Decoder::new(buf_reader).unwrap());
+                self.stream = stream;
+                self.stream_handle = stream_handle;
+                self.sink = Sink::try_new(&self.stream_handle).unwrap();
+                self.sink.append(Decoder::new(buf_reader).unwrap());
                 self.play();
             }
             // for
@@ -310,15 +335,27 @@ impl Player for MusicPlayer {
         }
         true
     }
+
+    fn current_lyric(&self) -> &str {
+        if let Some(lyric) = &self.current_lyric {
+            return lyric.as_str();
+        } else {
+            return "No Lyrics";
+        }
+    }
+
+    fn has_lyrics(&self) -> bool {
+        !self.play_list.lists.is_empty() && !self.play_list.lists.first().unwrap().lyrics.list.is_empty()
+    }
 }
 
 impl MusicPlayer {
     pub fn volume(&self) -> f32 {
-        return self._sink.volume();
+        return self.sink.volume();
     }
 
     pub fn set_volume(&mut self, new_volume: f32) -> bool {
-        self._sink.set_volume(new_volume);
+        self.sink.set_volume(new_volume);
         true
     }
 
