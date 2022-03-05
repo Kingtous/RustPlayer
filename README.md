@@ -1,7 +1,11 @@
-# RustPlayer
+# RustPlayer [![GitHub tag](https://img.shields.io/github/tag/Kingtous/RustPlayer)](https://GitHub.com/Kingtous/RustPlayer/tags/)
 
 ![build status](https://github.com/Kingtous/RustPlayer/actions/workflows/rust.yml/badge.svg)
 [![Rust Build, bump tag version and release](https://github.com/Kingtous/RustPlayer/actions/workflows/rust-release.yml/badge.svg)](https://github.com/Kingtous/RustPlayer/actions/workflows/rust-release.yml)
+[![Linux](https://svgshare.com/i/Zhy.svg)](https://svgshare.com/i/Zhy.svg)
+[![macOS](https://svgshare.com/i/ZjP.svg)](https://svgshare.com/i/ZjP.svg)
+[![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
+[![GitHub stars](https://badgen.net/github/stars/Kingtous/RustPlayer)](https://github.com/Kingtous/RustPlayer/stargazers/)
 
 An local audio player using completely terminal gui. MacOS, Linux, Windows are all supported.
 
