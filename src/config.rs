@@ -26,9 +26,9 @@ pub struct Config {
 impl Config {
     pub fn default() -> Self {
         Self {
-            refresh_rate: Duration::from_millis(50),
-            tick_gap: Duration::from_millis(100),
-            home_page: "https://github.com/Kingtous"
+            refresh_rate: Duration::from_millis(100),
+            tick_gap: Duration::from_millis(200),
+            home_page: "https://github.com/Kingtous",
         }
     }
 }

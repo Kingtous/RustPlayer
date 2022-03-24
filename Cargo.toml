@@ -11,7 +11,7 @@ rand = "0.8.5"
 tui = "0.17.0"
 crossterm = "0.23.0"
 
-rodio = "0.15.0"
+rodio = { version = "0.15.0", features = ["symphonia-aac", "mp3", "wav", "flac"] }
 mp3-duration = "0.1.10"
 
 failure = "0.1.8"
@@ -19,3 +19,8 @@ failure = "0.1.8"
 open = "2.1.0"
 
 regex = "1.5.4"
+
+reqwest = { version = "0.11", features = ["json"] }
+tokio = { version = "1", features = ["full"] }
+
+m3u8-rs = "3.0.0"

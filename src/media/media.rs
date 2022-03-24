@@ -18,6 +18,7 @@
 
 pub enum Source {
     Http(String),
+    M3u8(String),
     Local(String),
 }
 

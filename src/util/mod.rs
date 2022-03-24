@@ -16,4 +16,5 @@
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
 pub mod lyrics;
-mod event;
+pub mod net;
+pub mod m3u8;
