@@ -42,3 +42,21 @@ pub fn handle_music_controller(app: &mut App, code: KeyCode) -> bool {
         _ => {return false;}
     }
 }
+
+pub fn handle_radio_controller(app: &mut App, code: KeyCode) -> bool {
+    // if app.active_modules != ActiveModules::MusicController {
+    //     return false;
+    // }
+    let player = &mut app.radio;
+    match code {
+        KeyCode::Char('s') | KeyCode::Char('S') => {
+            if player.is_playing() {
+                player.pause();
+            } else {
+                player.resume();
+            }
+            return true;
+        }
+        _ => {return false;}
+    }
+}

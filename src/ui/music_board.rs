@@ -109,10 +109,11 @@ where
         ])
         .alignment(Alignment::Center);
     }
-    let mut blk = Block::default().borders(Borders::ALL).title("Panel").border_type(BorderType::Rounded).title_alignment(Alignment::Center);
-    if app.active_modules == ActiveModules::MusicController {
-        blk = blk.border_style(Style::default().fg(Color::Cyan));
-    }
+    let blk = Block::default().borders(Borders::ALL).title("Panel").border_type(BorderType::Rounded).title_alignment(Alignment::Center);
+
+    // if app.active_modules == ActiveModules::MusicController {
+    //     blk = blk.border_style(Style::default().fg(Color::Cyan));
+    // }
     p = p.block(blk);
     frame.render_widget(p, main_layout_chunks[1]);
 }

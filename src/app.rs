@@ -43,11 +43,12 @@ use crate::{
     fs::FsExplorer,
     handler::handle_keyboard_event,
     main,
-    media::player::{MusicPlayer, Player},
+    media::player::{MusicPlayer, Player, RadioPlayer},
     ui::{
         fs::draw_fs_tree,
         help::draw_help,
         music_board::{draw_music_board, MusicController},
+        radio::{draw_radio_list, RadioExplorer},
         EventType,
     },
 };
@@ -66,14 +67,16 @@ pub enum Routes {
 #[derive(PartialEq)]
 pub enum ActiveModules {
     Fs,
-    MusicController,
+    RadioList,
 }
 
 pub struct App {
     pub mode: InputMode,
     pub fs: FsExplorer,
+    pub radio_fs: RadioExplorer,
     pub route_stack: Vec<Routes>,
     pub player: MusicPlayer,
+    pub radio: RadioPlayer,
     pub music_controller: MusicController,
     pub active_modules: ActiveModules,
     pub config: Config,
@@ -92,6 +95,8 @@ impl App {
             // terminal: None,
             route_stack: vec![Routes::Main],
             player: Player::new(),
+            radio: Player::new(),
+            radio_fs: RadioExplorer::new(),
             music_controller: MusicController {
                 state: ListState::default(),
             },
@@ -117,6 +122,7 @@ impl App {
         thread::spawn(move || loop {
             thread::sleep(tick);
             sd.send(EventType::Player);
+            sd.send(EventType::Radio);
         });
         // start event
         loop {
@@ -155,6 +161,10 @@ impl App {
                 let player = &mut self.player;
                 player.tick();
             }
+            EventType::Radio => {
+                let radio = &mut self.radio;
+                radio.tick();
+            },
         }
     }
 
@@ -219,7 +229,11 @@ impl App {
                     // .margin(2)
                     .split(area);
                 // 左侧
-                draw_fs_tree(self, frame, main_layout[0]);
+                if (self.active_modules == ActiveModules::RadioList) {
+                    draw_radio_list(self, frame, main_layout[0]);
+                } else {
+                    draw_fs_tree(self, frame, main_layout[0]);
+                }
                 // 右侧
                 draw_music_board(self, frame, main_layout[1]);
             }
@@ -230,7 +244,7 @@ impl App {
         Ok(())
     }
 
-    pub fn set_msg(&mut self,msg: &str) {
+    pub fn set_msg(&mut self, msg: &str) {
         self.msg = String::from(msg);
     }
 }

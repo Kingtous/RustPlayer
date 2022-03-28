@@ -23,20 +23,21 @@ use std::{
     ops::Add,
     path::Path,
     ptr::null,
-    sync::{Arc, mpsc, Mutex},
+    sync::{mpsc::{self, channel}, Arc, Mutex},
     thread,
     time::{Duration, Instant},
 };
 
-use rodio::{Decoder, Devices, OutputStream, OutputStreamHandle, Sink, Source};
+use m3u8_rs::{MediaPlaylist, Playlist};
 use rodio::cpal;
+use rodio::{Decoder, Devices, OutputStream, OutputStreamHandle, Sink, Source};
 use tui::widgets::ListState;
 
+use crate::m3u8::download_m3u8_playlist;
 use crate::{
     app,
     util::lyrics::{Lyric, Lyrics},
 };
-use crate::m3u8::download_m3u8_playlist;
 
 use super::media::Media;
 
@@ -45,7 +46,7 @@ pub enum PlayStatus {
     Waiting,
     Playing(Instant, Duration),
     // elapsed, times already played
-    Stopped(Duration),          // times already played
+    Stopped(Duration), // times already played
 }
 
 pub struct PlayListItem {
@@ -98,6 +99,12 @@ pub trait Player {
 
     // 有歌词
     fn has_lyrics(&self) -> bool;
+
+    // 音量
+    fn volume(&self) -> f32;
+
+    // 设置音量
+    fn set_volume(&mut self, new_volume: f32) -> bool; 
 }
 
 pub struct MusicPlayer {
@@ -136,20 +143,11 @@ impl Player for MusicPlayer {
 
     fn add_to_list(&mut self, media: Media, once: bool) -> bool {
         match media.src {
-            super::media::Source::Http(_) => {
-                false
-            }
+            super::media::Source::Http(_) => false,
             super::media::Source::Local(path) => {
                 return self.play_with_file(path, once);
             }
-            super::media::Source::M3u8(path) => {
-                tokio::spawn(
-                    async {
-                        let playlist = download_m3u8_playlist(path).await;
-                    }
-                );
-                return true;
-            },
+            super::media::Source::M3u8(path) => false,
         }
     }
 
@@ -296,18 +294,19 @@ impl Player for MusicPlayer {
     fn has_lyrics(&self) -> bool {
         !self.play_list.lists.is_empty()
             && !self.play_list.lists.first().unwrap().lyrics.list.is_empty()
+    }    
+    
+    fn volume(&self) -> f32 {
+        return self.sink.volume();
+    }
+
+    fn set_volume(&mut self, new_volume: f32) -> bool {
+        self.sink.set_volume(new_volume);
+        true
     }
 }
 
 impl MusicPlayer {
-    pub fn volume(&self) -> f32 {
-        return self.sink.volume();
-    }
-
-    pub fn set_volume(&mut self, new_volume: f32) -> bool {
-        self.sink.set_volume(new_volume);
-        true
-    }
 
     pub fn playing_song(&self) -> Option<&PlayListItem> {
         return self.play_list.lists.first();
@@ -387,5 +386,145 @@ impl MusicPlayer {
 impl Drop for MusicPlayer {
     fn drop(&mut self) {
         // println!()
+    }
+}
+
+pub struct RadioItem {
+    list: MediaPlaylist,
+    url: String,
+}
+
+pub struct RadioPlayer {
+    pub item: Option<RadioItem>,
+    pub list: Vec<PlayListItem>,
+    stream: OutputStream,
+    streamHandle: OutputStreamHandle,
+    sink: Sink,
+    is_playing: bool,
+    playing_id: Option<String>
+}
+
+impl Player for RadioPlayer {
+    
+    fn new() -> Self {
+        let (stream,handle) = OutputStream::try_default().unwrap();
+        let sink = Sink::try_new(&handle).unwrap();
+        RadioPlayer {
+            item: None,
+            list: vec![],
+            stream: stream,
+            streamHandle: handle,
+            sink: sink,
+            is_playing: false,
+            playing_id: None
+        }
+    }
+
+    fn add_to_list(&mut self, media: Media, _: bool) -> bool {
+        let src = media.src;
+        match src {
+            super::media::Source::Http(_) => false,
+            super::media::Source::M3u8(url) => {
+                let (tx, mut rx) = channel();
+                let m3u8_url = url.url.clone();
+                thread::spawn( move ||  {
+                    let playlist = download_m3u8_playlist(m3u8_url);
+                    tx.send(playlist).unwrap();
+                });
+                match rx.recv_timeout(Duration::from_secs(5)) {
+                    Ok(list) => {
+                        if let Ok(playlist) = list {
+                            match playlist {
+                                Playlist::MasterPlaylist(_) => {},
+                                Playlist::MediaPlaylist(pl) => {
+                                    let item = RadioItem {
+                                        list: pl,
+                                        url: url.url.clone(),
+                                    };
+                                    self.item = Some(item);
+                                    self.download_and_push();
+                                    self.play();
+                                }
+                            }
+                            return true;
+                        }
+                    }
+                    Err(err) => {
+                        // ignore
+                    }
+                }
+                false
+            }
+            super::media::Source::Local(_) => false,
+        }
+    }
+
+    fn play(&mut self) -> bool {
+        self.sink.play();
+        self.is_playing = true;
+        true
+    }
+
+    fn next(&mut self) -> bool {
+        false
+    }
+
+    fn stop(&mut self) -> bool {
+        self.sink.stop();
+        true
+    }
+
+    fn pause(&mut self) -> bool {
+        self.sink.pause();
+        true
+    }
+
+    fn resume(&mut self) -> bool {
+        self.sink.play();
+        self.is_playing = true;
+        true
+    }
+
+    fn get_progress(&self) -> (f32, f32) {
+        return (0.0,0.0);
+    }
+
+    fn is_playing(&self) -> bool {
+        self.is_playing
+    }
+
+    fn tick(&mut self) {
+        if self.is_playing {
+            self.download_and_push();
+        }
+    }
+
+    fn current_lyric(&self) -> &str {
+        return "";
+    }
+
+    fn has_lyrics(&self) -> bool {
+        false
+    }
+
+    fn volume(&self) -> f32 {
+        self.sink.volume()
+    }
+
+    fn set_volume(&mut self, new_volume: f32) -> bool {
+        self.sink.set_volume(new_volume);
+        true
+    }
+}
+
+impl RadioPlayer {
+    fn download_and_push(&mut self){
+        // if let Some(radio_cfg) = self.item {
+        //     radio_cfg.list.media_sequence
+        //     if self.sink.len() <= 1 {
+        //         self.item
+        //     }
+        // }
+        
     }
 }

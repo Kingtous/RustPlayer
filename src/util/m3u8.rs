@@ -9,10 +9,10 @@ use m3u8_rs::{MediaPlaylist, Playlist};
 
 use crate::net::{download, DownloadTimeoutError};
 
-pub async fn download_m3u8_playlist(url: String) -> Result<Playlist, failure::Error> {
+pub fn download_m3u8_playlist(url: String) -> Result<Playlist, failure::Error> {
     let (tx, rx) = mpsc::channel();
-    thread::spawn(move || {
-        download(url.as_str(), tx);
+    thread::spawn( move || {
+        download(url.as_str(), tx)
     });
     let resp = rx.recv_timeout(Duration::from_secs(5));
     return if let Ok(data) = resp {
@@ -26,6 +26,7 @@ pub async fn download_m3u8_playlist(url: String) -> Result<Playlist, failure::Er
             }
         }
     } else {
+        println!("{:?}",resp);
         Err(format_err!("Download Timeout in 5 seconds."))
     };
 }

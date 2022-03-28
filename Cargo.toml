@@ -24,3 +24,4 @@ reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 
 m3u8-rs = "3.0.0"
+dirs = "4.0.0"

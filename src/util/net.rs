@@ -21,6 +21,7 @@ impl failure::Fail for DownloadTimeoutError {
 
 }
 
+#[tokio::main]
 pub async fn download(url: &str, tx: Sender<String>) -> std::result::Result<(), failure::Error> {
     let resp = reqwest::get(url).await?.text().await?;
     tx.send(resp)?;

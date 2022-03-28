@@ -1,17 +1,17 @@
 // Copyright (C) 2022 Kingtous
-// 
+//
 // This file is part of RustPlayer.
-// 
+//
 // RustPlayer is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // RustPlayer is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -20,22 +20,23 @@ use crossterm::event::KeyCode;
 use crate::app::{ActiveModules, App, Routes};
 
 use self::{
-    fs::handle_fs, help::handle_help, music_controller::handle_music_controller,
-    player::handle_player,
+    fs::handle_fs, help::handle_help, music_controller::{handle_music_controller, handle_radio_controller},
+    player::{handle_player, handle_radio}, radio::handle_radio_fs,
 };
 
 mod fs;
 mod help;
 mod music_controller;
 mod player;
+mod radio;
 
 pub fn handle_active_modules(app: &mut App, key: KeyCode) -> bool {
     match key {
         KeyCode::Tab => {
             if app.active_modules == ActiveModules::Fs {
-                app.active_modules = ActiveModules::MusicController;
-            } else if app.active_modules == ActiveModules::MusicController {
-                app.active_modules = ActiveModules::Fs
+                app.active_modules = ActiveModules::RadioList;
+            } else if app.active_modules == ActiveModules::RadioList {
+                app.active_modules = ActiveModules::Fs;
             }
             return true;
         }
@@ -74,17 +75,35 @@ pub fn handle_keyboard_event(app: &mut App, key: KeyCode) {
             if flag {
                 return;
             }
-            flag = handle_fs(app, key);
-            if flag {
-                return;
-            }
-            flag = handle_player(app, key);
-            if flag {
-                return;
-            }
-            flag = handle_music_controller(app, key);
-            if flag {
-                return;
+            match app.active_modules {
+                ActiveModules::Fs => {
+                    flag = handle_fs(app, key);
+                    if flag {
+                        return;
+                    }
+                    flag = handle_player(app, key);
+                    if flag {
+                        return;
+                    }
+                    flag = handle_music_controller(app, key);
+                    if flag {
+                        return;
+                    }
+                }
+                ActiveModules::RadioList => {
+                    flag = handle_radio_fs(app, key);
+                    if flag {
+                        return;
+                    }
+                     flag = handle_radio(app, key);
+                    if flag {
+                        return;
+                    }
+                    flag = handle_radio_controller(app, key);
+                    if flag {
+                        return;
+                    }
+                }
             }
         }
         Routes::Help => {
