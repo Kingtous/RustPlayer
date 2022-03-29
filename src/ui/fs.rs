@@ -62,7 +62,7 @@ impl FsExplorer {
             dirs: vec![],
             index: list_state,
             on_error_msg_callback: callback,
-            accept_suffix: vec!["mp3", "wav", "flac"],
+            accept_suffix: vec!["mp3", "wav", "flac", "ts"],
         };
         let (dirs, files) = exp.visit_dir(path_str)?;
         exp.files = files;

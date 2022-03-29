@@ -18,3 +18,4 @@
 pub mod lyrics;
 pub mod net;
 pub mod m3u8;
+pub mod ffmpeg;

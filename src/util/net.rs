@@ -1,4 +1,5 @@
 use std::fmt::{Debug, Display, Formatter, write};
+use std::io::Bytes;
 use std::sync::mpsc::Sender;
 
 pub struct DownloadTimeoutError{
@@ -22,8 +23,15 @@ impl failure::Fail for DownloadTimeoutError {
 }
 
 #[tokio::main]
-pub async fn download(url: &str, tx: Sender<String>) -> std::result::Result<(), failure::Error> {
+pub async fn download(url: &str, tx: &Sender<String>) -> std::result::Result<(), failure::Error> {
     let resp = reqwest::get(url).await?.text().await?;
+    tx.send(resp)?;
+    Ok(())
+}
+
+#[tokio::main]
+pub async fn download_as_bytes(url: &str, tx: &Sender<bytes::Bytes>) -> std::result::Result<(), failure::Error> {
+    let resp = reqwest::get(url).await?.bytes().await?;
     tx.send(resp)?;
     Ok(())
 }

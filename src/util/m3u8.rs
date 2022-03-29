@@ -12,7 +12,7 @@ use crate::net::{download, DownloadTimeoutError};
 pub fn download_m3u8_playlist(url: String) -> Result<Playlist, failure::Error> {
     let (tx, rx) = mpsc::channel();
     thread::spawn( move || {
-        download(url.as_str(), tx)
+        download(url.as_str(), &tx)
     });
     let resp = rx.recv_timeout(Duration::from_secs(5));
     return if let Ok(data) = resp {

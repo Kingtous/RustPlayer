@@ -27,17 +27,23 @@ use std::{
     thread,
     time::{Duration, Instant},
 };
+use std::future::Future;
+use std::io::Cursor;
+use std::sync::mpsc::{Receiver, Sender, TryRecvError};
+use bytes::Bytes;
 
 use m3u8_rs::{MediaPlaylist, Playlist};
-use rodio::cpal;
+use rodio::{cpal, source::Delay};
 use rodio::{Decoder, Devices, OutputStream, OutputStreamHandle, Sink, Source};
+use rodio::decoder::DecoderError;
 use tui::widgets::ListState;
 
-use crate::m3u8::download_m3u8_playlist;
+use crate::{m3u8::download_m3u8_playlist, util::net::download_as_bytes};
 use crate::{
     app,
     util::lyrics::{Lyric, Lyrics},
 };
+use crate::net::download;
 
 use super::media::Media;
 
@@ -104,7 +110,7 @@ pub trait Player {
     fn volume(&self) -> f32;
 
     // 设置音量
-    fn set_volume(&mut self, new_volume: f32) -> bool; 
+    fn set_volume(&mut self, new_volume: f32) -> bool;
 }
 
 pub struct MusicPlayer {
@@ -294,8 +300,8 @@ impl Player for MusicPlayer {
     fn has_lyrics(&self) -> bool {
         !self.play_list.lists.is_empty()
             && !self.play_list.lists.first().unwrap().lyrics.list.is_empty()
-    }    
-    
+    }
+
     fn volume(&self) -> f32 {
         return self.sink.volume();
     }
@@ -398,10 +404,12 @@ pub struct RadioPlayer {
     pub item: Option<RadioItem>,
     pub list: Vec<PlayListItem>,
     stream: OutputStream,
-    streamHandle: OutputStreamHandle,
+    stream_handle: OutputStreamHandle,
     sink: Sink,
     is_playing: bool,
-    playing_id: Option<String>
+    last_playing_id: Option<String>,
+    data_tx: Sender<bytes::Bytes>,
+    data_rx: Receiver<bytes::Bytes>
 }
 
 impl Player for RadioPlayer {
@@ -409,14 +417,17 @@ impl Player for RadioPlayer {
     fn new() -> Self {
         let (stream,handle) = OutputStream::try_default().unwrap();
         let sink = Sink::try_new(&handle).unwrap();
+        let (tx,rx) = channel();
         RadioPlayer {
             item: None,
             list: vec![],
-            stream: stream,
-            streamHandle: handle,
-            sink: sink,
+            stream,
+            stream_handle: handle,
+            sink,
             is_playing: false,
-            playing_id: None
+            last_playing_id: None,
+            data_rx: rx,
+            data_tx: tx
         }
     }
 
@@ -494,8 +505,22 @@ impl Player for RadioPlayer {
     }
 
     fn tick(&mut self) {
-        if self.is_playing {
-            self.download_and_push();
+        match self.data_rx.try_recv() {
+            Ok(data) => {
+                let f = File::open("D:\\audio.wav").unwrap();
+                // let curser = Cursor::new(data.to_vec());
+                let decoder = Decoder::new(BufReader::new(f));
+                // Decoder::
+                match decoder {
+                    Ok(dec) => {
+                        self.sink.append(dec);
+                    }
+                    Err(err) => {
+                        eprintln!("{:?}",err);
+                    }
+                }
+            }
+            Err(no_data) => {}
         }
     }
 
@@ -519,12 +544,30 @@ impl Player for RadioPlayer {
 
 impl RadioPlayer {
     fn download_and_push(&mut self){
-        // if let Some(radio_cfg) = self.item {
-        //     radio_cfg.list.media_sequence
-        //     if self.sink.len() <= 1 {
-        //         self.item
-        //     }
-        // }
-        
+        if self.is_playing {
+            if self.last_playing_id == None {
+                // 直接全部下载
+                let item = &self.item;
+                if let Some(radio) = item {
+                    let tx_clone = self.data_tx.clone();
+                    let index = radio.url.clone().rfind("/").unwrap();
+                    let base_url = radio.url.as_str()[0..index + 1].to_string();
+                    let urls: Vec<String> = radio.list.segments.iter().map(|e| {
+                        e.uri.clone()
+                    }).map(|uri| {
+                        base_url.clone() + &uri
+                    }).collect();
+                    thread::spawn(move || {
+                        for url in urls {
+                            match download_as_bytes(url.as_str(), &tx_clone) {
+                                _ => {}
+                            }
+                        }
+                    });
+                }
+            } else {
+                
+            }
+        }
     }
 }
