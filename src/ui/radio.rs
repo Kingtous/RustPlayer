@@ -40,7 +40,7 @@ impl RadioExplorer {
             f = File::open(config_dir).unwrap();
         }
         let reader = BufReader::new(f);
-        let lines = reader.lines().map(|i| i.unwrap());
+        let lines = reader.lines().map(|i| i.unwrap_or("".to_string()));
         for line in lines {
             let radio_bean: Vec<_> = line.split(' ').collect();
             let config = RadioConfig {
