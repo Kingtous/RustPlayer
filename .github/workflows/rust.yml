@@ -25,5 +25,5 @@ jobs:
       with:
         toolchain: stable
     - run: sudo apt update
-    - run: sudo apt install -y libasound2-dev libavcodec-dev libavformat-dev libswresample-dev libavutil-dev
+    - run: sudo apt install -y libasound2-dev libavcodec-dev libavformat-dev libswresample-dev libavutil-dev libavformat-dev
     - run: cargo build --release
