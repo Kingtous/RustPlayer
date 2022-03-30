@@ -17,6 +17,7 @@
 
 use bytes::Bytes;
 use std::cmp::max;
+use std::fs;
 use std::future::Future;
 use std::io::Cursor;
 use std::sync::mpsc::{Receiver, Sender, TryRecvError};
@@ -43,13 +44,14 @@ use rodio::{Decoder, Devices, OutputStream, OutputStreamHandle, Sink, Source};
 use tui::widgets::ListState;
 
 use crate::net::download;
+use crate::util::m3u8::empty_cache;
 use crate::{
     app,
     util::lyrics::{Lyric, Lyrics},
 };
 use crate::{
     m3u8::download_m3u8_playlist,
-    util::{ffmpeg, net::download_as_bytes},
+    util::{net::download_as_bytes},
 };
 
 use super::media::Media;
@@ -425,6 +427,7 @@ impl Player for RadioPlayer {
         let (stream, handle) = OutputStream::try_default().unwrap();
         let sink = Sink::try_new(&handle).unwrap();
         let (tx, rx) = channel();
+        empty_cache();
         RadioPlayer {
             item: None,
             list: vec![],
@@ -441,6 +444,7 @@ impl Player for RadioPlayer {
     }
 
     fn add_to_list(&mut self, media: Media, _: bool) -> bool {
+        self.last_playing_id = -1;
         let src = media.src;
         match src {
             super::media::Source::Http(_) => false,
@@ -496,6 +500,7 @@ impl Player for RadioPlayer {
 
     fn pause(&mut self) -> bool {
         self.sink.pause();
+        self.is_playing = false;
         true
     }
 
@@ -523,11 +528,13 @@ impl Player for RadioPlayer {
                 let timestamp = SystemTime::now()
                     .duration_since(SystemTime::UNIX_EPOCH)
                     .unwrap();
-                let fname = timestamp.as_nanos().to_string() + ".ts";
+                let fname = timestamp.as_nanos().to_string();
                 cache_dir.push(fname.as_str());
                 let mut f = File::create(cache_dir.clone()).unwrap();
                 f.write_all(data.as_ref()).unwrap();
                 let decoder = ffmpeg_decoder::Decoder::open(cache_dir);
+                // let buffer = BufReader::new(f);
+                // let decoder = rodio::Decoder::new_mp4(buffer, rodio::decoder::Mp4Type::M4a);
                 // Decoder::
                 match decoder {
                     Ok(dec) => {
@@ -592,7 +599,7 @@ impl RadioPlayer {
                     for url in urls {
                         match download_as_bytes(url.as_str(), &tx_clone) {
                             _ => {
-                                println!("{:?} downloaded",url);
+                                // println!("{:?} downloaded",url);
                             }
                         }
                     }
@@ -608,8 +615,9 @@ impl RadioPlayer {
                         Playlist::MasterPlaylist(_) => todo!(),
                         Playlist::MediaPlaylist(media_playlist) => {
                             let seq = media_playlist.media_sequence;
-                            let skip_num = max(self.last_playing_id - seq, 0) as usize;
+                            let skip_num = max(self.last_playing_id - seq + 1, 0) as usize;
                             let segs = &media_playlist.segments[skip_num..];
+                            // println!("add {:?}",segs);
                             let urls: Vec<String> = segs
                                 .iter()
                                 .map(|e| e.uri.clone())
@@ -622,7 +630,7 @@ impl RadioPlayer {
                                 for url in urls {
                                     match download_as_bytes(url.as_str(), &tx_clone) {
                                         _ => {
-                                            println!("update {:?}",url);
+                                            // println!("update {:?}",url);
                                         }
                                     }
                                 }

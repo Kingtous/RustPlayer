@@ -50,7 +50,7 @@ use crate::{
         music_board::{draw_music_board, MusicController},
         radio::{draw_radio_list, RadioExplorer},
         EventType,
-    },
+    }, util::m3u8::empty_cache,
 };
 
 pub enum InputMode {
@@ -131,6 +131,7 @@ impl App {
                     match self.mode {
                         InputMode::Normal => match key.code {
                             KeyCode::Char('q') | KeyCode::Char('Q') => {
+                                empty_cache();
                                 break;
                             }
                             code => {
