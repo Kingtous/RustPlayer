@@ -11,7 +11,7 @@ rand = "0.8.5"
 tui = "0.17.0"
 crossterm = "0.23.0"
 
-rodio = { version = "0.15.0", features = ["mp3", "wav", "flac","symphonia-all"] }
+rodio = { version = "0.15.0", features = ["mp3", "wav", "flac"] }
 mp3-duration = "0.1.10"
 
 failure = "0.1.8"
