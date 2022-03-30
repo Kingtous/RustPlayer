@@ -571,13 +571,13 @@ impl RadioPlayer {
     /// 触发下载
     fn download_and_push(&mut self) {
         self.elasped = SystemTime::now();
-        let index = radio.url.clone().rfind("/").unwrap();
-        let base_url = radio.url.as_str()[0..index + 1].to_string();
         // 第一次下载，直接全部下载
         if self.last_playing_id == -1 {
             // 直接全部下载
             let item = &self.item;
             if let Some(radio) = item {
+                let index = radio.url.clone().rfind("/").unwrap();
+                let base_url = radio.url.as_str()[0..index + 1].to_string();
                 let tx_clone = self.data_tx.clone();
                 let urls: Vec<String> = radio
                     .list
@@ -591,32 +591,39 @@ impl RadioPlayer {
                 thread::spawn(move || {
                     for url in urls {
                         match download_as_bytes(url.as_str(), &tx_clone) {
-                            _ => {}
+                            _ => {
+                                println!("{:?} downloaded",url);
+                            }
                         }
                     }
                 });
             }
         } else {
             // 更新playlist列表
-            if let Some(radio_item) = &self.item {
-                match download_m3u8_playlist(radio_item.url.clone()) {
+            if let Some(radio) = &self.item {
+                let index = radio.url.clone().rfind("/").unwrap();
+                let base_url = radio.url.as_str()[0..index + 1].to_string();
+                match download_m3u8_playlist(radio.url.clone()) {
                     Ok(playlist) => match playlist {
                         Playlist::MasterPlaylist(_) => todo!(),
                         Playlist::MediaPlaylist(media_playlist) => {
                             let seq = media_playlist.media_sequence;
                             let skip_num = max(self.last_playing_id - seq, 0) as usize;
                             let segs = &media_playlist.segments[skip_num..];
-                            let urls: Vec<String> = segs 
+                            let urls: Vec<String> = segs
                                 .iter()
                                 .map(|e| e.uri.clone())
                                 .map(|uri| base_url.clone() + &uri)
                                 .collect();
-                            self.last_playing_id = seq
-                                + max((media_playlist.segments.len() - 1) as i32, 0);
+                            self.last_playing_id =
+                                seq + max((media_playlist.segments.len() - 1) as i32, 0);
+                            let tx_clone = self.data_tx.clone();
                             thread::spawn(move || {
                                 for url in urls {
                                     match download_as_bytes(url.as_str(), &tx_clone) {
-                                        _ => {}
+                                        _ => {
+                                            println!("update {:?}",url);
+                                        }
                                     }
                                 }
                             });
@@ -624,7 +631,7 @@ impl RadioPlayer {
                     },
                     Err(_) => {
                         // ignore
-                    },
+                    }
                 }
             }
         }
