@@ -416,6 +416,8 @@ pub struct RadioPlayer {
     last_playing_id: i32,
     data_tx: Sender<bytes::Bytes>,
     data_rx: Receiver<bytes::Bytes>,
+    elasped: SystemTime,
+    gap: Duration,
 }
 
 impl Player for RadioPlayer {
@@ -433,6 +435,8 @@ impl Player for RadioPlayer {
             last_playing_id: -1,
             data_rx: rx,
             data_tx: tx,
+            elasped: SystemTime::now(),
+            gap: Duration::from_secs(5),
         }
     }
 
@@ -537,8 +541,11 @@ impl Player for RadioPlayer {
             Err(_) => {}
         }
         // check length
-        if self.is_playing() && self.sink.len() <= 2{
-            self.download_and_push();
+        if let Ok(elapsed) = self.elasped.elapsed() {
+            // 过了gap时间重新拉取m3u8
+            if self.is_playing() && elapsed.as_secs() > self.gap.as_secs() {
+                self.download_and_push();
+            }
         }
     }
 
@@ -561,17 +568,17 @@ impl Player for RadioPlayer {
 }
 
 impl RadioPlayer {
-
     /// 触发下载
     fn download_and_push(&mut self) {
+        self.elasped = SystemTime::now();
+        let index = radio.url.clone().rfind("/").unwrap();
+        let base_url = radio.url.as_str()[0..index + 1].to_string();
         // 第一次下载，直接全部下载
         if self.last_playing_id == -1 {
             // 直接全部下载
             let item = &self.item;
             if let Some(radio) = item {
                 let tx_clone = self.data_tx.clone();
-                let index = radio.url.clone().rfind("/").unwrap();
-                let base_url = radio.url.as_str()[0..index + 1].to_string();
                 let urls: Vec<String> = radio
                     .list
                     .segments
@@ -579,7 +586,8 @@ impl RadioPlayer {
                     .map(|e| e.uri.clone())
                     .map(|uri| base_url.clone() + &uri)
                     .collect();
-                self.last_playing_id = radio.list.media_sequence + max((radio.list.segments.len() - 1) as i32,0);
+                self.last_playing_id =
+                    radio.list.media_sequence + max((radio.list.segments.len() - 1) as i32, 0);
                 thread::spawn(move || {
                     for url in urls {
                         match download_as_bytes(url.as_str(), &tx_clone) {
@@ -592,20 +600,31 @@ impl RadioPlayer {
             // 更新playlist列表
             if let Some(radio_item) = &self.item {
                 match download_m3u8_playlist(radio_item.url.clone()) {
-                    Ok(playlist) => {
-                        match playlist {
-                            Playlist::MasterPlaylist(_) => todo!(),
-                            Playlist::MediaPlaylist(media_playlist) => {
-                                let seq = media_playlist.media_sequence;
-                                let skip_num = max(self.last_playing_id - seq, 0) as usize;
-                                // let segs = media_playlist.segments[skip_num..].;
-                                
-
-                                self.download_and_push();
-                            },
+                    Ok(playlist) => match playlist {
+                        Playlist::MasterPlaylist(_) => todo!(),
+                        Playlist::MediaPlaylist(media_playlist) => {
+                            let seq = media_playlist.media_sequence;
+                            let skip_num = max(self.last_playing_id - seq, 0) as usize;
+                            let segs = &media_playlist.segments[skip_num..];
+                            let urls: Vec<String> = segs 
+                                .iter()
+                                .map(|e| e.uri.clone())
+                                .map(|uri| base_url.clone() + &uri)
+                                .collect();
+                            self.last_playing_id = seq
+                                + max((media_playlist.segments.len() - 1) as i32, 0);
+                            thread::spawn(move || {
+                                for url in urls {
+                                    match download_as_bytes(url.as_str(), &tx_clone) {
+                                        _ => {}
+                                    }
+                                }
+                            });
                         }
                     },
-                    Err(_) => todo!(),
+                    Err(_) => {
+                        // ignore
+                    },
                 }
             }
         }
