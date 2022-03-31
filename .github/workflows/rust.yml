@@ -18,12 +18,26 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, macOS-latest]
+        include:
+          - name: linux
+            os: ubuntu-18.04
+            artifact_name: target/release/RustPlayer
+          - name: macos
+            os: macos-latest
+            artifact_name: target/release/RustPlayer
     steps:
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
-    - run: sudo apt update
-    - run: sudo apt install -y libasound2-dev libavcodec-dev libavformat-dev libswresample-dev libavutil-dev libavformat-dev
+    - if: ${{ matrix.name }} == "linux"
+      run: sudo apt update
+    - if: ${{ matrix.name }} == "linux"
+      run: sudo apt install -y libasound2-dev libavcodec-dev libavformat-dev libswresample-dev libavutil-dev libavformat-dev
+    - if: ${{ matrix.name }} == "macos"
+      run: brew install ffmpeg@4 && brew link ffmpeg@4
     - run: cargo build --release

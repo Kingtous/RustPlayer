@@ -42,6 +42,9 @@ impl RadioExplorer {
         let reader = BufReader::new(f);
         let lines = reader.lines().map(|i| i.unwrap_or("".to_string()));
         for line in lines {
+            if line.is_empty() {
+                continue;
+            }
             let radio_bean: Vec<_> = line.split(' ').collect();
             let config = RadioConfig {
                 name: radio_bean[0].to_string(),
