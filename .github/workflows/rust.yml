@@ -34,10 +34,10 @@ jobs:
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
-    - if: ${{ matrix.name }} == "linux"
+    - if: ${{ matrix.os }} == "ubuntu-18.04"
       run: sudo apt update
-    - if: ${{ matrix.name }} == "linux"
+    - if: ${{ matrix.os }} == "ubuntu-18.04"
       run: sudo apt install -y libasound2-dev libavcodec-dev libavformat-dev libswresample-dev libavutil-dev libavformat-dev
-    - if: ${{ matrix.name }} == "macos"
+    - if: ${{ matrix.os }} == "macos-latest"
       run: brew install ffmpeg@4 && brew link ffmpeg@4
     - run: cargo build --release
