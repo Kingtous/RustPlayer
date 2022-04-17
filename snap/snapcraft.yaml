@@ -1,0 +1,40 @@
+name: rustplayer
+version: git
+summary: A local music player && network radio player
+description: |
+  RustPlayer is a local music player && network radio player:
+
+base: core18
+confinement: devmode
+
+parts:
+  rustplayer:
+    plugin: rust
+    source: .
+    build-packages:
+      - libasound2-dev
+      - libavcodec-dev
+      - libavformat-dev 
+      - libswresample-dev
+      - libavutil-dev
+      - pkg-config
+      - libssl-dev
+      - clang
+    stage-packages:
+      - libasound2
+      - libavcodec57 
+      - libavformat57 
+      - libswresample2 
+      - libavutil55
+
+layout:
+  /usr/share/alsa:
+    bind: $SNAP/usr/share/alsa
+
+apps:
+  rustplayer:
+    command: bin/RustPlayer
+    plugs:
+      - network
+      - audio-playback
+      - home
