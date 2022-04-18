@@ -7,9 +7,26 @@
 [![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
 [![GitHub stars](https://badgen.net/github/stars/Kingtous/RustPlayer)](https://github.com/Kingtous/RustPlayer/stargazers/)
 
-An local audio player using completely terminal gui. MacOS, Linux, Windows are all supported.
+An local audio player & network m3u8 radio player using completely terminal gui. MacOS, Linux, Windows are all supported.
 
 RustPlayer is under development. If u have encountered any problem, please open issues :)
+
+## Features
+
+- Support mp3, wav, flac format
+- Support m3u8 network radio
+    - tested: 央广之声、经济之声. check `radio.ini` for details.
+    - please copy `radio.ini` to `~/.config/rustplayer`
+- Lyrics Supported
+- Multi-platform supported
+- Low CPU and memory usage
+- File explorer
+- Playlist playback supported
+- Wave animation
+- Playback progress
+- Next audio
+- Adjust volume
+- Developed by Kingtous
 
 ## Screenshots
 
@@ -33,19 +50,10 @@ The screenshot from Deepin
 
 - [Bilibili Video](https://www.bilibili.com/video/BV1T34y1k7Xf)
 
-## Features
 
-- Support mp3, wav, flac format
-- Lyrics Supported
-- Multi-platform supported
-- Low CPU and memory usage
-- File explorer
-- Playlist playback supported
-- Wave animation
-- Playback progress
-- Next audio
-- Adjust volume
-- Developed by Kingtous
+## Install RustPlayer by Snap Store
+
+`snap install rustplayer --devmode`
 
 ## Download Binary Release Directly and Run
 
@@ -56,6 +64,8 @@ The binary release of macOS, Linux, Windows can be found in artifacts of [RustPl
 If u found this binary release is not working or u like compiling RustPlayer by youselef. Yes, The step to compile RustPlayer is really easy.
 
 - clone this repo.
+- install dependencies
+    - check `.github/rust.yml` for details
 - `cargo run` in root of this project.
 
 if u think this repo is helpful, ⭐ this project and let me know :)
