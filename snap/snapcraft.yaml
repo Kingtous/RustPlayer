@@ -5,7 +5,7 @@ description: |
   RustPlayer is a local music player && network radio player:
 
 base: core18
-confinement: devmode
+confinement: strict
 
 parts:
   rustplayer:
@@ -38,3 +38,7 @@ apps:
       - network
       - audio-playback
       - home
+      # connect manually
+      - pulseaudio
+      - alsa
+      - removable-media
