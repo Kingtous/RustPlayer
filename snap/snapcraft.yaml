@@ -10,6 +10,7 @@ confinement: strict
 architectures:
   - build-on: i386
   - build-on: amd64
+  - build-on: arm64
   - build-on: armhf
   - build-on: ppc64el
 
