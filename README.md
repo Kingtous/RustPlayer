@@ -1,11 +1,13 @@
-# RustPlayer [![GitHub tag](https://img.shields.io/github/tag/Kingtous/RustPlayer)](https://GitHub.com/Kingtous/RustPlayer/tags/)
+# RustPlayer [![GitHub tag](https://img.shields.io/github/tag/Kingtous/RustPlayer)](https://GitHub.com/Kingtous/RustPlayer/tags/) [![GitHub stars](https://badgen.net/github/stars/Kingtous/RustPlayer)](https://github.com/Kingtous/RustPlayer/stargazers/)
 
 ![build status](https://github.com/Kingtous/RustPlayer/actions/workflows/rust.yml/badge.svg)
 [![Rust Build, bump tag version and release](https://github.com/Kingtous/RustPlayer/actions/workflows/rust-release.yml/badge.svg)](https://github.com/Kingtous/RustPlayer/actions/workflows/rust-release.yml)
+[![fclash](https://snapcraft.io/fclash/badge.svg)](https://snapcraft.io/fclash)
+[![fclash](https://snapcraft.io/fclash/trending.svg?name=0)](https://snapcraft.io/fclash)
+
 [![Linux](https://svgshare.com/i/Zhy.svg)](https://svgshare.com/i/Zhy.svg)
 [![macOS](https://svgshare.com/i/ZjP.svg)](https://svgshare.com/i/ZjP.svg)
 [![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
-[![GitHub stars](https://badgen.net/github/stars/Kingtous/RustPlayer)](https://github.com/Kingtous/RustPlayer/stargazers/)
 
 An local audio player & network m3u8 radio player using completely terminal gui. MacOS, Linux, Windows are all supported.
 
