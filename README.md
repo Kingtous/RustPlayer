@@ -71,3 +71,40 @@ If u found this binary release is not working or u like compiling RustPlayer by 
 - `cargo run` in root of this project.
 
 if u think this repo is helpful, ⭐ this project and let me know :)
+
+## TroubleShoot
+
+### Linux
+
+Q: No sound in Linux, console shows "unable to open slave". I'm using `snd_hda_intel` drivers.
+
+A: check your valid sound card. Check by `lspci -knn|grep -iA2 audio`. An example is:
+```
+04:00.1 Audio device [0403]: Advanced Micro Devices, Inc. [AMD/ATI] Renoir Radeon High Definition Audio Controller [1002:1637]
+        Subsystem: Lenovo Device [17aa:3814]
+        Kernel driver in use: snd_hda_intel
+--
+04:00.5 Multimedia controller [0480]: Advanced Micro Devices, Inc. [AMD] ACP/ACP3X/ACP6x Audio Coprocessor [1022:15e2] (rev 01)
+        Subsystem: Lenovo Device [17aa:3832]
+        Kernel modules: snd_pci_acp3x, snd_rn_pci_acp3x, snd_pci_acp5x
+04:00.6 Audio device [0403]: Advanced Micro Devices, Inc. [AMD] Family 17h/19h HD Audio Controller [1022:15e3]
+        Subsystem: Lenovo Device [17aa:3833]
+        Kernel driver in use: snd_hda_intel
+```
+
+In the case above, 2 audio devices found in your Linux. Let's check which device is in use, we will use `index` to identify the default device. Type `modinfo snd_hda_intel | grep index`, if only shows:
+
+```
+parm: index:Index value for Intel HD audio interface. (array of int)
+```
+
+which means index 0 will be chosen to be the default output device.
+
+In this case, you can try device 1. create files below:
+```shell
+> cat /etc/modprobe.d/default.conf                
+
+options snd_hda_intel index=1
+```
+
+reboot and check if it works.
