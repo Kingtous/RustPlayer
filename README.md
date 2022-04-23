@@ -2,8 +2,8 @@
 
 ![build status](https://github.com/Kingtous/RustPlayer/actions/workflows/rust.yml/badge.svg)
 [![Rust Build, bump tag version and release](https://github.com/Kingtous/RustPlayer/actions/workflows/rust-release.yml/badge.svg)](https://github.com/Kingtous/RustPlayer/actions/workflows/rust-release.yml)
-[![fclash](https://snapcraft.io/fclash/badge.svg)](https://snapcraft.io/fclash)
-[![fclash](https://snapcraft.io/fclash/trending.svg?name=0)](https://snapcraft.io/fclash)
+[![rustplayer](https://snapcraft.io/rustplayer/badge.svg)](https://snapcraft.io/rustplayer)
+[![rustplayer](https://snapcraft.io/rustplayer/trending.svg?name=0)](https://snapcraft.io/rustplayer)
 
 [![Linux](https://svgshare.com/i/Zhy.svg)](https://svgshare.com/i/Zhy.svg)
 [![macOS](https://svgshare.com/i/ZjP.svg)](https://svgshare.com/i/ZjP.svg)
