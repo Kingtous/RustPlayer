@@ -38,21 +38,36 @@ jobs:
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
+
     - name: install deps for linux
       if: matrix.os == 'ubuntu-18.04'
       run: sudo apt update && sudo apt install -y libasound2-dev libavcodec-dev libavformat-dev libswresample-dev libavutil-dev libavformat-dev pkg-config
+
     - name: Install vcpkg for windows
       if: matrix.os == 'windows-latest'
       uses: lukka/run-vcpkg@v10
       with:
         vcpkgGitCommitId: e809a42f87565e803b2178a0c11263f462d1800a
+
     - name: Install ffmpeg deps for windows
       if: matrix.os == 'windows-latest'
       # run: vcpkg install llvm:x64-windows ffmpeg:x64-windows-static-md
       run: |
-        vcpkg install llvm:x64-windows
-        vcpkg install ffmpeg:x64-windows
+        vcpkg install llvm:x64-windows-release
+        vcpkg install ffmpeg:x64-windows-release
+        
     - name: install ffmpeg deps for macOS
       if: matrix.os == 'macos-latest'
       run: brew install ffmpeg@4 pkg-config && brew link ffmpeg@4
-    - run: cargo build --release
+
+    - name: build RustPlayer
+      run: cargo build --release
+
+    - name: Test
+      run: cargo test
+
+    - name: Upload binaries to release
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.asset_name }}
+        path: ${{ matrix.artifact_name }}
