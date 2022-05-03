@@ -73,17 +73,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install msys2 for windows
-      if: matrix.os == 'windows-latest'
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: ${{matrix.sys}}
-          # update: true
-          install: >-
-            mingw-w64-${{matrix.env}}-ffmpeg
-            mingw-w64-${{matrix.env}}-llvm
-            mingw-w64-${{matrix.env}}-clang
-            mingw-w64-${{matrix.env}}-pkg-config
-            mingw-w64-${{matrix.env}}-rust
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: ${{matrix.sys}}
+        # update: true
+        install: >-
+          mingw-w64-${{matrix.env}}-ffmpeg
+          mingw-w64-${{matrix.env}}-llvm
+          mingw-w64-${{matrix.env}}-clang
+          mingw-w64-${{matrix.env}}-pkg-config
+          mingw-w64-${{matrix.env}}-rust
 
     - name: build RustPlayer
       run: |
