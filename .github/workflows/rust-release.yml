@@ -6,39 +6,37 @@ on:
       - v*
 
 jobs:
-  publish:
-    name: Publish for ${{ matrix.os }}
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04,windows-latest,macOS-latest]
+        os: [ubuntu-18.04, macOS-latest] 
         include:
           - name: linux
             os: ubuntu-18.04
             artifact_name: target/release/RustPlayer
-            asset_name: RustPlayer-linux
-          - name: windows
-            os: windows-latest
-            artifact_name: target/release/RustPlayer.exe
-            asset_name: RustPlayer-windows.exe
           - name: macos
             os: macos-latest
             artifact_name: target/release/RustPlayer
-            asset_name: RustPlayer-macos
-
+          # - name: windows
+          #   os: windows-latest
+          #   artifact_name: target/release/RustPlayer.exe
+          #   asset_name: RustPlayer-windows.exe
     steps:
-    - uses: actions/checkout@v1
-
+    - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
       with:
-        profile: minimal
         toolchain: stable
-      
-    - name: Install libasound2-dev for Linux
-      if: matrix.os == 'ubuntu-18.04'
-      run: sudo apt install -y libasound2-dev
 
-    - name: Build
+    - name: install deps for linux
+      if: matrix.os == 'ubuntu-18.04'
+      run: sudo apt update && sudo apt install -y libasound2-dev libavcodec-dev libavformat-dev libswresample-dev libavutil-dev libavformat-dev pkg-config
+        
+    - name: install ffmpeg deps for macOS
+      if: matrix.os == 'macos-latest'
+      run: brew install ffmpeg@4 pkg-config && brew link ffmpeg@4
+
+    - name: build RustPlayer
       run: cargo build --release
 
     - name: Test
@@ -49,3 +47,46 @@ jobs:
       with:
         name: ${{ matrix.asset_name }}
         path: ${{ matrix.artifact_name }}
+
+  build-on-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+          - { sys: mingw64, env: x86_64, artifact_name: target/release/RustPlayer.exe , asset_name: RustPlayer-windows-x86_64.exe }
+          # - { sys: mingw32, env: i686 }
+          # - { sys: ucrt64,  env: ucrt-x86_64 }  # Experimental!
+          # - { sys: clang64, env: clang-x86_64 } # Experimental!
+    # defaults:
+    #   run:
+    #     shell: msys2 {0}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install msys2 for windows
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: ${{matrix.sys}}
+        # update: true
+        install: >-
+          mingw-w64-${{matrix.env}}-ffmpeg
+          mingw-w64-${{matrix.env}}-llvm
+          mingw-w64-${{matrix.env}}-clang
+          mingw-w64-${{matrix.env}}-pkg-config
+          mingw-w64-${{matrix.env}}-rust
+
+    - name: build RustPlayer
+      run: |
+        set MSYSTEM=MINGW64
+        msys2 -c 'cargo build --release'
+
+    - name: Test
+      run: |
+        set MSYSTEM=MINGW64
+        msys2 -c 'cargo test'
+
+    - name: Upload binaries to release
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.asset_name }}
+        path: ${{ matrix.artifact_name }}
+

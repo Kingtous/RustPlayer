@@ -1,5 +1,5 @@
 name: rustplayer
-version: '1.1.0'
+version: '1.1.0-2'
 summary: A local music player && network radio player
 description: |
   RustPlayer is a local music player && network radio player:
