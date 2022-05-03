@@ -61,12 +61,12 @@ jobs:
   build-on-windows:
     runs-on: windows-latest
     strategy:
-    matrix:
-      include:
-        - { sys: mingw64, env: x86_64, artifact_name: target/release/RustPlayer }
-        # - { sys: mingw32, env: i686 }
-        # - { sys: ucrt64,  env: ucrt-x86_64 }  # Experimental!
-        # - { sys: clang64, env: clang-x86_64 } # Experimental!
+      matrix:
+        include:
+          - { sys: mingw64, env: x86_64, artifact_name: target/release/RustPlayer }
+          # - { sys: mingw32, env: i686 }
+          # - { sys: ucrt64,  env: ucrt-x86_64 }  # Experimental!
+          # - { sys: clang64, env: clang-x86_64 } # Experimental!
     # defaults:
     #   run:
     #     shell: msys2 {0}
@@ -91,5 +91,5 @@ jobs:
 
     - name: Test
       run: |
-      set MSYSTEM=MINGW64
-      msys2 -c 'cargo test'
+        set MSYSTEM=MINGW64
+        msys2 -c 'cargo test'
