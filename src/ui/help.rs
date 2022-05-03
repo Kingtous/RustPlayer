@@ -44,7 +44,8 @@ where
     frame.render_widget(homepage_text, chunks[0]);
 
     let help_table = Table::new([Row::new(["h", "open or close this help."]),
-        Row::new(["Tab","switch highlight block. (Explorer/Control Panel)"]),
+        Row::new(["Tab","switch highlight block. (Audio Explorer/Radio Explorer)"]),
+        Row::new(["r","open radio config list."]),
         Row::new(["->","add audio to play list."]),
         Row::new(["Enter","play audio immediately and clean play list or enter selected folder."]),
         Row::new(["-/+","decrease/increase volume."]),

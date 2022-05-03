@@ -33,12 +33,13 @@ where
     B: Backend,
 {
     let player = &mut app.player;
+    let radio = &app.radio;
 
     let mut rng = rand::thread_rng();
     let mut cols = vec![];
     for _ in 0..20 {
         let mut i = rng.gen_range(0..10);
-        if !player.is_playing() {
+        if !player.is_playing() && !radio.is_playing() {
             i = 0
         }
         cols.push(("_", i))

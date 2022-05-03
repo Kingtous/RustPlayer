@@ -25,6 +25,12 @@ pub fn handle_help(app: &mut App, code: KeyCode) -> bool {
             open::that(app.config.home_page);
             return true;
         }
+        KeyCode::Char('r') => {
+            let mut config_dir = dirs::config_dir().unwrap();
+            config_dir.push("RustPlayer");
+            open::that(config_dir);
+            return true;
+        }
         _ => {return false;}
     }
 }

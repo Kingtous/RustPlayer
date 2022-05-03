@@ -15,35 +15,44 @@
 // You should have received a copy of the GNU General Public License
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
+use bytes::Bytes;
+use std::cmp::max;
+use std::fs;
+use std::future::Future;
+use std::io::Cursor;
+use std::sync::mpsc::{Receiver, Sender, TryRecvError};
 use std::{
     cell::{Ref, RefCell},
     fmt::Debug,
     fs::File,
-    io::{BufReader, Error},
+    io::{BufReader, Error, Write},
     ops::Add,
     path::Path,
     ptr::null,
-    sync::{mpsc::{self, channel}, Arc, Mutex},
+    sync::{
+        mpsc::{self, channel},
+        Arc, Mutex,
+    },
     thread,
-    time::{Duration, Instant},
+    time::{Duration, Instant, SystemTime},
 };
-use std::future::Future;
-use std::io::Cursor;
-use std::sync::mpsc::{Receiver, Sender, TryRecvError};
-use bytes::Bytes;
 
 use m3u8_rs::{MediaPlaylist, Playlist};
+use rodio::decoder::DecoderError;
 use rodio::{cpal, source::Delay};
 use rodio::{Decoder, Devices, OutputStream, OutputStreamHandle, Sink, Source};
-use rodio::decoder::DecoderError;
 use tui::widgets::ListState;
 
-use crate::{m3u8::download_m3u8_playlist, util::net::download_as_bytes};
+use crate::net::download;
+use crate::util::m3u8::empty_cache;
 use crate::{
     app,
     util::lyrics::{Lyric, Lyrics},
 };
-use crate::net::download;
+use crate::{
+    m3u8::download_m3u8_playlist,
+    util::{net::download_as_bytes},
+};
 
 use super::media::Media;
 
@@ -192,7 +201,9 @@ impl Player for MusicPlayer {
                 let (stream, stream_handle) = OutputStream::try_default().unwrap();
                 self.stream = stream;
                 self.stream_handle = stream_handle;
+                let volume = self.volume();
                 self.sink = Sink::try_new(&self.stream_handle).unwrap();
+                self.set_volume(volume);
                 self.sink.append(Decoder::new(buf_reader).unwrap());
                 self.play();
             }
@@ -313,7 +324,6 @@ impl Player for MusicPlayer {
 }
 
 impl MusicPlayer {
-
     pub fn playing_song(&self) -> Option<&PlayListItem> {
         return self.play_list.lists.first();
     }
@@ -407,17 +417,19 @@ pub struct RadioPlayer {
     stream_handle: OutputStreamHandle,
     sink: Sink,
     is_playing: bool,
-    last_playing_id: Option<String>,
+    last_playing_id: i32,
     data_tx: Sender<bytes::Bytes>,
-    data_rx: Receiver<bytes::Bytes>
+    data_rx: Receiver<bytes::Bytes>,
+    elasped: SystemTime,
+    gap: Duration,
 }
 
 impl Player for RadioPlayer {
-    
     fn new() -> Self {
-        let (stream,handle) = OutputStream::try_default().unwrap();
+        let (stream, handle) = OutputStream::try_default().unwrap();
         let sink = Sink::try_new(&handle).unwrap();
-        let (tx,rx) = channel();
+        let (tx, rx) = channel();
+        empty_cache();
         RadioPlayer {
             item: None,
             list: vec![],
@@ -425,20 +437,23 @@ impl Player for RadioPlayer {
             stream_handle: handle,
             sink,
             is_playing: false,
-            last_playing_id: None,
+            last_playing_id: -1,
             data_rx: rx,
-            data_tx: tx
+            data_tx: tx,
+            elasped: SystemTime::now(),
+            gap: Duration::from_secs(5),
         }
     }
 
     fn add_to_list(&mut self, media: Media, _: bool) -> bool {
+        self.last_playing_id = -1;
         let src = media.src;
         match src {
             super::media::Source::Http(_) => false,
             super::media::Source::M3u8(url) => {
                 let (tx, mut rx) = channel();
                 let m3u8_url = url.url.clone();
-                thread::spawn( move ||  {
+                thread::spawn(move || {
                     let playlist = download_m3u8_playlist(m3u8_url);
                     tx.send(playlist).unwrap();
                 });
@@ -446,7 +461,7 @@ impl Player for RadioPlayer {
                     Ok(list) => {
                         if let Ok(playlist) = list {
                             match playlist {
-                                Playlist::MasterPlaylist(_) => {},
+                                Playlist::MasterPlaylist(_) => {}
                                 Playlist::MediaPlaylist(pl) => {
                                     let item = RadioItem {
                                         list: pl,
@@ -487,6 +502,7 @@ impl Player for RadioPlayer {
 
     fn pause(&mut self) -> bool {
         self.sink.pause();
+        self.is_playing = false;
         true
     }
 
@@ -497,7 +513,7 @@ impl Player for RadioPlayer {
     }
 
     fn get_progress(&self) -> (f32, f32) {
-        return (0.0,0.0);
+        return (0.0, 0.0);
     }
 
     fn is_playing(&self) -> bool {
@@ -507,20 +523,38 @@ impl Player for RadioPlayer {
     fn tick(&mut self) {
         match self.data_rx.try_recv() {
             Ok(data) => {
-                let f = File::open("D:\\audio.wav").unwrap();
-                // let curser = Cursor::new(data.to_vec());
-                let decoder = Decoder::new(BufReader::new(f));
+                // let f = File::open("D:\\audio.wav").unwrap();
+                let mut cache_dir = dirs::cache_dir().unwrap();
+                cache_dir.push("RustPlayer");
+                std::fs::create_dir_all(cache_dir.clone()).unwrap();
+                let timestamp = SystemTime::now()
+                    .duration_since(SystemTime::UNIX_EPOCH)
+                    .unwrap();
+                let fname = timestamp.as_nanos().to_string();
+                cache_dir.push(fname.as_str());
+                let mut f = File::create(cache_dir.clone()).unwrap();
+                f.write_all(data.as_ref()).unwrap();
+                let decoder = ffmpeg_decoder::Decoder::open(cache_dir);
+                // let buffer = BufReader::new(f);
+                // let decoder = rodio::Decoder::new_mp4(buffer, rodio::decoder::Mp4Type::M4a);
                 // Decoder::
                 match decoder {
                     Ok(dec) => {
                         self.sink.append(dec);
                     }
                     Err(err) => {
-                        eprintln!("{:?}",err);
+                        eprintln!("{:?}", err);
                     }
                 }
             }
-            Err(no_data) => {}
+            Err(_) => {}
+        }
+        // check length
+        if let Ok(elapsed) = self.elasped.elapsed() {
+            // 过了gap时间重新拉取m3u8
+            if self.is_playing() && elapsed.as_secs() > self.gap.as_secs() {
+                self.download_and_push();
+            }
         }
     }
 
@@ -543,30 +577,72 @@ impl Player for RadioPlayer {
 }
 
 impl RadioPlayer {
-    fn download_and_push(&mut self){
-        if self.is_playing {
-            if self.last_playing_id == None {
-                // 直接全部下载
-                let item = &self.item;
-                if let Some(radio) = item {
-                    let tx_clone = self.data_tx.clone();
-                    let index = radio.url.clone().rfind("/").unwrap();
-                    let base_url = radio.url.as_str()[0..index + 1].to_string();
-                    let urls: Vec<String> = radio.list.segments.iter().map(|e| {
-                        e.uri.clone()
-                    }).map(|uri| {
-                        base_url.clone() + &uri
-                    }).collect();
-                    thread::spawn(move || {
-                        for url in urls {
-                            match download_as_bytes(url.as_str(), &tx_clone) {
-                                _ => {}
+    /// 触发下载
+    fn download_and_push(&mut self) {
+        self.elasped = SystemTime::now();
+        // 第一次下载，直接全部下载
+        if self.last_playing_id == -1 {
+            // 直接全部下载
+            let item = &self.item;
+            if let Some(radio) = item {
+                let index = radio.url.clone().rfind("/").unwrap();
+                let base_url = radio.url.as_str()[0..index + 1].to_string();
+                let tx_clone = self.data_tx.clone();
+                let urls: Vec<String> = radio
+                    .list
+                    .segments
+                    .iter()
+                    .map(|e| e.uri.clone())
+                    .map(|uri| base_url.clone() + &uri)
+                    .collect();
+                self.last_playing_id =
+                    radio.list.media_sequence + max((radio.list.segments.len() - 1) as i32, 0);
+                thread::spawn(move || {
+                    for url in urls {
+                        match download_as_bytes(url.as_str(), &tx_clone) {
+                            _ => {
+                                // println!("{:?} downloaded",url);
                             }
                         }
-                    });
+                    }
+                });
+            }
+        } else {
+            // 更新playlist列表
+            if let Some(radio) = &self.item {
+                let index = radio.url.clone().rfind("/").unwrap();
+                let base_url = radio.url.as_str()[0..index + 1].to_string();
+                match download_m3u8_playlist(radio.url.clone()) {
+                    Ok(playlist) => match playlist {
+                        Playlist::MasterPlaylist(_) => todo!(),
+                        Playlist::MediaPlaylist(media_playlist) => {
+                            let seq = media_playlist.media_sequence;
+                            let skip_num = max(self.last_playing_id - seq + 1, 0) as usize;
+                            let segs = &media_playlist.segments[skip_num..];
+                            // println!("add {:?}",segs);
+                            let urls: Vec<String> = segs
+                                .iter()
+                                .map(|e| e.uri.clone())
+                                .map(|uri| base_url.clone() + &uri)
+                                .collect();
+                            self.last_playing_id =
+                                seq + max((media_playlist.segments.len() - 1) as i32, 0);
+                            let tx_clone = self.data_tx.clone();
+                            thread::spawn(move || {
+                                for url in urls {
+                                    match download_as_bytes(url.as_str(), &tx_clone) {
+                                        _ => {
+                                            // println!("update {:?}",url);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    },
+                    Err(_) => {
+                        // ignore
+                    }
                 }
-            } else {
-                
             }
         }
     }

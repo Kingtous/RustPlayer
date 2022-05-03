@@ -1,0 +1,15 @@
+[package]
+name = "ffmpeg-decoder-cli"
+version = "0.1.0"
+authors = ["tarkah <admin@tarkah.dev>"]
+edition = "2018"
+
+[dependencies]
+ffmpeg-decoder = { path = "../", features = ['rodio_source'] }
+
+rodio = { version = "0.11", default-features=false }
+
+anyhow = "1.0"
+env_logger = "0.7"
+log = "0.4"
+structopt = "0.3"
