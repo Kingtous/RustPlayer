@@ -21,7 +21,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04, macOS-latest, windows-latest]
+        os: [ubuntu-18.04, macOS-latest] 
         include:
           - name: linux
             os: ubuntu-18.04
@@ -29,10 +29,10 @@ jobs:
           - name: macos
             os: macos-latest
             artifact_name: target/release/RustPlayer
-          - name: windows
-            os: windows-latest
-            artifact_name: target/release/RustPlayer.exe
-            asset_name: RustPlayer-windows.exe
+          # - name: windows
+          #   os: windows-latest
+          #   artifact_name: target/release/RustPlayer.exe
+          #   asset_name: RustPlayer-windows.exe
     steps:
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
@@ -42,19 +42,6 @@ jobs:
     - name: install deps for linux
       if: matrix.os == 'ubuntu-18.04'
       run: sudo apt update && sudo apt install -y libasound2-dev libavcodec-dev libavformat-dev libswresample-dev libavutil-dev libavformat-dev pkg-config
-
-    - name: Install vcpkg for windows
-      if: matrix.os == 'windows-latest'
-      uses: lukka/run-vcpkg@v10
-      with:
-        vcpkgGitCommitId: e809a42f87565e803b2178a0c11263f462d1800a
-
-    - name: Install ffmpeg deps for windows
-      if: matrix.os == 'windows-latest'
-      # run: vcpkg install llvm:x64-windows ffmpeg:x64-windows-static-md
-      run: |
-        vcpkg install llvm:x64-windows-release
-        vcpkg install ffmpeg:x64-windows-release
         
     - name: install ffmpeg deps for macOS
       if: matrix.os == 'macos-latest'
@@ -71,3 +58,39 @@ jobs:
     #   with:
     #     name: ${{ matrix.asset_name }}
     #     path: ${{ matrix.artifact_name }}
+  build-on-windows:
+    runs-on: windows-latest
+    strategy:
+    matrix:
+      include:
+        - { sys: mingw64, env: x86_64, artifact_name: target/release/RustPlayer }
+        # - { sys: mingw32, env: i686 }
+        # - { sys: ucrt64,  env: ucrt-x86_64 }  # Experimental!
+        # - { sys: clang64, env: clang-x86_64 } # Experimental!
+    # defaults:
+    #   run:
+    #     shell: msys2 {0}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install msys2 for windows
+      if: matrix.os == 'windows-latest'
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{matrix.sys}}
+          # update: true
+          install: >-
+            mingw-w64-${{matrix.env}}-ffmpeg
+            mingw-w64-${{matrix.env}}-llvm
+            mingw-w64-${{matrix.env}}-clang
+            mingw-w64-${{matrix.env}}-pkg-config
+            mingw-w64-${{matrix.env}}-rust
+
+    - name: build RustPlayer
+      run: |
+        set MSYSTEM=MINGW64
+        msys2 -c 'cargo build --release'
+
+    - name: Test
+      run: |
+      set MSYSTEM=MINGW64
+      msys2 -c 'cargo test'
