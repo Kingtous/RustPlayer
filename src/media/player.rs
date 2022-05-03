@@ -201,7 +201,9 @@ impl Player for MusicPlayer {
                 let (stream, stream_handle) = OutputStream::try_default().unwrap();
                 self.stream = stream;
                 self.stream_handle = stream_handle;
+                let volume = self.volume();
                 self.sink = Sink::try_new(&self.stream_handle).unwrap();
+                self.set_volume(volume);
                 self.sink.append(Decoder::new(buf_reader).unwrap());
                 self.play();
             }
