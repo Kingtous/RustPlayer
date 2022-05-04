@@ -79,7 +79,7 @@ jobs:
     - name: Install msys2 for windows
       uses: msys2/setup-msys2@v2
       with:
-        location: D:\\msys64
+        location: D:\\
         msystem: ${{matrix.sys}}
         # update: true
         install: >-
