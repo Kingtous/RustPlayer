@@ -1,6 +1,7 @@
 name: Rust
 
 on:
+  workflow_dispatch:
   push:
     paths-ignore: 
       - 'README.md'
@@ -26,9 +27,11 @@ jobs:
           - name: linux
             os: ubuntu-18.04
             artifact_name: target/release/RustPlayer
+            asset_name: RustPlayer-linux-amd64
           - name: macos
             os: macos-latest
             artifact_name: target/release/RustPlayer
+            asset_name: RustPlayer-macos
           # - name: windows
           #   os: windows-latest
           #   artifact_name: target/release/RustPlayer.exe
@@ -53,18 +56,19 @@ jobs:
     - name: Test
       run: cargo test
 
-    # - name: Upload binaries to release
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: ${{ matrix.asset_name }}
-    #     path: ${{ matrix.artifact_name }}
+    - name: Upload binaries to release
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.asset_name }}
+        path: ${{ matrix.artifact_name }}
+
   build-on-windows:
     runs-on: windows-latest
     strategy:
       matrix:
         include:
-          - { sys: mingw64, env: x86_64, artifact_name: target/release/RustPlayer }
-          # - { sys: mingw32, env: i686 }
+          - { sys: mingw64, env: x86_64, artifact_name: Output/rustplayer-setup.exe , asset_name: rustplayer-setup-x86_64.exe }
+          # - { sys: mingw32, env: i686, artifact_name: target/release/RustPlayer.exe , asset_name: RustPlayer-windows-x86.exe }
           # - { sys: ucrt64,  env: ucrt-x86_64 }  # Experimental!
           # - { sys: clang64, env: clang-x86_64 } # Experimental!
     # defaults:
@@ -75,6 +79,7 @@ jobs:
     - name: Install msys2 for windows
       uses: msys2/setup-msys2@v2
       with:
+        location: D:\\
         msystem: ${{matrix.sys}}
         # update: true
         install: >-
@@ -89,7 +94,18 @@ jobs:
         set MSYSTEM=MINGW64
         msys2 -c 'cargo build --release'
 
+    - name: package RustPlayer using Inno
+      run: |
+        iscc.exe setup.iss
+
     - name: Test
       run: |
         set MSYSTEM=MINGW64
         msys2 -c 'cargo test'
+
+    - name: Upload binaries to release
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.asset_name }}
+        path: ${{ matrix.artifact_name }}
+

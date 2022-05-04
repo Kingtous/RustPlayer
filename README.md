@@ -59,7 +59,11 @@ The screenshot from Deepin
 
 ## Download Binary Release Directly and Run
 
-The binary release of macOS, Linux, Windows can be found in artifacts of [RustPlayer Release Action](https://github.com/Kingtous/RustPlayer/actions/workflows/rust-release.yml). Click the top item of the list to download the latest release.
+The binary release of macOS, Linux, Windows can be found in artifacts of [RustPlayer Release Action](https://github.com/Kingtous/RustPlayer/actions/workflows/rust.yml). Click the top item of the list to download the latest release.
+
+### Runtime Requirements
+
+-
 
 ## Compile RustPlayer and run
 
