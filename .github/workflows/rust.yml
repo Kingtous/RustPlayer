@@ -1,7 +1,6 @@
 name: Rust
 
 on:
-  workflow_dispatch:
   push:
     paths-ignore: 
       - 'README.md'
@@ -56,11 +55,11 @@ jobs:
     - name: Test
       run: cargo test
 
-    # - name: Upload binaries to release
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: ${{ matrix.asset_name }}
-    #     path: ${{ matrix.artifact_name }}
+    - name: Upload binaries to release
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.asset_name }}
+        path: ${{ matrix.artifact_name }}
 
   build-on-windows:
     runs-on: windows-latest
@@ -79,6 +78,7 @@ jobs:
     - name: Install msys2 for windows
       uses: msys2/setup-msys2@v2
       with:
+        location: D:\\msys64
         msystem: ${{matrix.sys}}
         # update: true
         install: >-
@@ -93,7 +93,7 @@ jobs:
         set MSYSTEM=MINGW64
         msys2 -c 'cargo build --release'
 
-    - name: package RustPlayer using Inno Setup
+    - name: package RustPlayer using Inno
       run: |
         iscc.exe setup.iss
 
@@ -102,9 +102,9 @@ jobs:
         set MSYSTEM=MINGW64
         msys2 -c 'cargo test'
 
-    # - name: Upload binaries to release
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: ${{ matrix.asset_name }}
-    #     path: ${{ matrix.artifact_name }}
+    - name: Upload binaries to release
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.asset_name }}
+        path: ${{ matrix.artifact_name }}
 
