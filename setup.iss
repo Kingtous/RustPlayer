@@ -6,7 +6,7 @@
 #define MyAppPublisher "Kingtous"
 #define MyAppURL "https:/kingtous.cn"
 #define MyAppExeName "RustPlayer.exe"
-#define MSYS2 "D:\msys64\mingw64"
+#define MSYS2 "C:\msys64\mingw64"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
