@@ -61,15 +61,12 @@ The screenshot from Deepin
 
 The binary release of macOS, Linux, Windows can be found in artifacts of [RustPlayer Release Action](https://github.com/Kingtous/RustPlayer/actions/workflows/rust.yml). Click the top item of the list to download the latest release.
 
-### Runtime Requirements
-
--
-
 ## Compile RustPlayer and run
 
 If u found this binary release is not working or u like compiling RustPlayer by youselef. Yes, The step to compile RustPlayer is really easy.
 
 - clone this repo.
+  - for arch/manjaro, please use [fix/arch](https://github.com/Kingtous/RustPlayer/tree/fix/arch) branch.
 - install dependencies
     - check `.github/rust.yml` for details
 - `cargo run` in root of this project.
