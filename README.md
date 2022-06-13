@@ -1,13 +1,15 @@
 # RustPlayer [![GitHub tag](https://img.shields.io/github/tag/Kingtous/RustPlayer)](https://GitHub.com/Kingtous/RustPlayer/tags/) [![GitHub stars](https://badgen.net/github/stars/Kingtous/RustPlayer)](https://github.com/Kingtous/RustPlayer/stargazers/)
 
 ![build status](https://github.com/Kingtous/RustPlayer/actions/workflows/rust.yml/badge.svg)
-[![Rust Build, bump tag version and release](https://github.com/Kingtous/RustPlayer/actions/workflows/rust-release.yml/badge.svg)](https://github.com/Kingtous/RustPlayer/actions/workflows/rust-release.yml)
 [![rustplayer](https://snapcraft.io/rustplayer/badge.svg)](https://snapcraft.io/rustplayer)
 [![rustplayer](https://snapcraft.io/rustplayer/trending.svg?name=0)](https://snapcraft.io/rustplayer)
 
 [![Linux](https://svgshare.com/i/Zhy.svg)](https://svgshare.com/i/Zhy.svg)
 [![macOS](https://svgshare.com/i/ZjP.svg)](https://svgshare.com/i/ZjP.svg)
 [![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/549d1445d4f14a18b89fbb2340fe15fc)](https://www.codacy.com/gh/Kingtous/RustPlayer/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Kingtous/RustPlayer&amp;utm_campaign=Badge_Grade)
+![commit](https://img.shields.io/github/commit-activity/y/kingtous/RustPlayer)
+[![stars](https://img.shields.io/github/stars/kingtous/RustPlayer?style=social)]()
 
 An local audio player & network m3u8 radio player using completely terminal gui. MacOS, Linux, Windows are all supported.
 
@@ -30,6 +32,19 @@ RustPlayer is under development. If u have encountered any problem, please open 
 - Adjust volume
 - Developed by Kingtous
 
+## Demo Video
+
+- [Bilibili Video](https://www.bilibili.com/video/BV1T34y1k7Xf)
+
+
+## Install RustPlayer by Snap Store
+
+`snap install rustplayer --devmode`
+
+## Download Binary Release Directly and Run
+
+The binary release of macOS, Linux, Windows can be found in artifacts of [RustPlayer Release Action](https://github.com/Kingtous/RustPlayer/actions/workflows/rust.yml). Click the top item of the list to download the latest release.
+
 ## Screenshots
 
 ### Windows
@@ -47,19 +62,6 @@ The screenshot from Deepin
 ### macOS
 
 ![macOS RustPlayer](https://s2.loli.net/2022/03/03/Z9altpG63qk24W8.png)
-
-## Demo Video
-
-- [Bilibili Video](https://www.bilibili.com/video/BV1T34y1k7Xf)
-
-
-## Install RustPlayer by Snap Store
-
-`snap install rustplayer --devmode`
-
-## Download Binary Release Directly and Run
-
-The binary release of macOS, Linux, Windows can be found in artifacts of [RustPlayer Release Action](https://github.com/Kingtous/RustPlayer/actions/workflows/rust.yml). Click the top item of the list to download the latest release.
 
 ## Compile RustPlayer and run
 
