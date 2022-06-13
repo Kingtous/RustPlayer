@@ -20,8 +20,11 @@ use crossterm::event::KeyCode;
 use crate::app::{ActiveModules, App, Routes};
 
 use self::{
-    fs::handle_fs, help::handle_help, music_controller::{handle_music_controller, handle_radio_controller},
-    player::{handle_player, handle_radio}, radio::handle_radio_fs,
+    fs::handle_fs,
+    help::handle_help,
+    music_controller::{handle_music_controller, handle_radio_controller},
+    player::{handle_player, handle_radio},
+    radio::handle_radio_fs,
 };
 
 mod fs;
@@ -95,7 +98,7 @@ pub fn handle_keyboard_event(app: &mut App, key: KeyCode) {
                     if flag {
                         return;
                     }
-                     flag = handle_radio(app, key);
+                    flag = handle_radio(app, key);
                     if flag {
                         return;
                     }

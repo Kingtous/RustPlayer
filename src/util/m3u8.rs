@@ -1,4 +1,4 @@
-use std::fs::{File, read_dir};
+use std::fs::{read_dir, File};
 use std::sync::mpsc;
 use std::sync::mpsc::RecvTimeoutError;
 use std::thread;
@@ -32,7 +32,7 @@ pub fn empty_cache() {
     if dir.exists() && dir.is_dir() {
         let it = read_dir(dir.clone());
         if let Ok(dirs) = it {
-            for dir in dirs{
+            for dir in dirs {
                 if let Ok(d) = dir {
                     std::fs::remove_file(d.path());
                 }

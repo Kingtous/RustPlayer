@@ -49,10 +49,7 @@ use crate::{
     app,
     util::lyrics::{Lyric, Lyrics},
 };
-use crate::{
-    m3u8::download_m3u8_playlist,
-    util::{net::download_as_bytes},
-};
+use crate::{m3u8::download_m3u8_playlist, util::net::download_as_bytes};
 
 use super::media::Media;
 
