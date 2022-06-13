@@ -1,26 +1,24 @@
-use std::fmt::{Debug, Display, Formatter, write};
+use std::fmt::{write, Debug, Display, Formatter};
 use std::io::Bytes;
 use std::sync::mpsc::Sender;
 
-pub struct DownloadTimeoutError{
-    msg: String
+pub struct DownloadTimeoutError {
+    msg: String,
 }
 
 impl Display for DownloadTimeoutError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-       write!(f,"Download Timeout! {}",self.msg.as_str())
+        write!(f, "Download Timeout! {}", self.msg.as_str())
     }
 }
 
 impl Debug for DownloadTimeoutError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f,"Download Timeout: {}",self.msg.as_str())
+        write!(f, "Download Timeout: {}", self.msg.as_str())
     }
 }
 
-impl failure::Fail for DownloadTimeoutError {
-
-}
+impl failure::Fail for DownloadTimeoutError {}
 
 #[tokio::main]
 pub async fn download(url: &str, tx: &Sender<String>) -> std::result::Result<(), failure::Error> {
@@ -30,7 +28,10 @@ pub async fn download(url: &str, tx: &Sender<String>) -> std::result::Result<(),
 }
 
 #[tokio::main]
-pub async fn download_as_bytes(url: &str, tx: &Sender<bytes::Bytes>) -> std::result::Result<(), failure::Error> {
+pub async fn download_as_bytes(
+    url: &str,
+    tx: &Sender<bytes::Bytes>,
+) -> std::result::Result<(), failure::Error> {
     let resp = reqwest::get(url).await?.bytes().await?;
     tx.send(resp)?;
     Ok(())

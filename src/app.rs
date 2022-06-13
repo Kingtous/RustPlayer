@@ -50,7 +50,8 @@ use crate::{
         music_board::{draw_music_board, MusicController},
         radio::{draw_radio_list, RadioExplorer},
         EventType,
-    }, util::m3u8::empty_cache,
+    },
+    util::m3u8::empty_cache,
 };
 
 pub enum InputMode {
@@ -165,7 +166,7 @@ impl App {
             EventType::Radio => {
                 let radio = &mut self.radio;
                 radio.tick();
-            },
+            }
         }
     }
 

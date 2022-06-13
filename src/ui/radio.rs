@@ -8,7 +8,7 @@ use dirs;
 use tui::{
     backend::Backend,
     layout::{Alignment, Rect},
-    style::{Style, Color},
+    style::{Color, Style},
     widgets::{Block, BorderType, Borders, List, ListItem, ListState},
     Frame,
 };
@@ -70,14 +70,15 @@ where
     for radio in &fs.radios {
         item_vec.push(ListItem::new(radio.name.as_str()));
     }
-    let list = List::new(item_vec.as_ref()).block(
-        Block::default()
-            .borders(Borders::all())
-            .title("Radio List")
-            .border_type(BorderType::Rounded)
-            .border_style(Style::default().fg(Color::Cyan))
-            .title_alignment(Alignment::Center),
-    )
+    let list = List::new(item_vec.as_ref())
+        .block(
+            Block::default()
+                .borders(Borders::all())
+                .title("Radio List")
+                .border_type(BorderType::Rounded)
+                .border_style(Style::default().fg(Color::Cyan))
+                .title_alignment(Alignment::Center),
+        )
         .highlight_style(Style::default().bg(Color::Cyan))
         .highlight_symbol("> ");
     frame.render_stateful_widget(list, area, &mut fs.index);
