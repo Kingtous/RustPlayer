@@ -1,5 +1,5 @@
-use std::fmt::{write, Debug, Display, Formatter};
-use std::io::Bytes;
+use std::fmt::{Debug, Display, Formatter};
+
 use std::sync::mpsc::Sender;
 
 pub struct DownloadTimeoutError {

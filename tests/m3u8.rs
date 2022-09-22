@@ -1,10 +1,5 @@
 use m3u8_rs::Playlist;
-use std::{
-    io::{Error, Result},
-    sync::mpsc,
-    thread,
-    time::Duration,
-};
+use std::{sync::mpsc, thread, time::Duration};
 
 include!("../src/util/net.rs");
 
@@ -21,7 +16,7 @@ fn fetch_and_play() {
             let entity = m3u8_rs::parse_playlist(s.as_bytes()).unwrap();
             let list = entity.1;
             match list {
-                Playlist::MasterPlaylist(master_play_list) => {}
+                Playlist::MasterPlaylist(_master_play_list) => {}
                 Playlist::MediaPlaylist(media_play_list) => {
                     for seg in &media_play_list.segments {
                         println!("{}", seg.uri);
@@ -30,7 +25,7 @@ fn fetch_and_play() {
                 }
             }
         }
-        Err(e) => {
+        Err(_e) => {
             assert!(false);
         }
     }

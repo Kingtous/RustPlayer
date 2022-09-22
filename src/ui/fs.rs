@@ -16,20 +16,17 @@
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::env::current_dir;
-use std::fmt::{Debug, Display, Formatter};
-use std::fs::{DirEntry, ReadDir};
+use std::fmt::Debug;
+use std::fs;
+use std::fs::DirEntry;
 use std::path::Path;
-use std::{fs, os};
 
-use crossterm::style::Colors;
 use failure::{Error, Fail};
 use tui::backend::Backend;
 use tui::layout::{Alignment, Constraint, Direction, Layout, Rect};
 use tui::style::{Color, Style};
 use tui::text::Text;
-use tui::widgets::{
-    Block, BorderType, Borders, List, ListItem, ListState, Paragraph, Widget, Wrap,
-};
+use tui::widgets::{Block, BorderType, Borders, List, ListItem, ListState, Paragraph, Wrap};
 use tui::Frame;
 
 use crate::app::ActiveModules;

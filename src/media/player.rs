@@ -15,40 +15,27 @@
 // You should have received a copy of the GNU General Public License
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
-use bytes::Bytes;
 use std::cmp::max;
-use std::fs;
-use std::future::Future;
-use std::io::Cursor;
-use std::sync::mpsc::{Receiver, Sender, TryRecvError};
+
+use std::sync::mpsc::{Receiver, Sender};
 use std::{
-    cell::{Ref, RefCell},
-    fmt::Debug,
     fs::File,
-    io::{BufReader, Error, Write},
+    io::{BufReader, Write},
     ops::Add,
     path::Path,
-    ptr::null,
-    sync::{
-        mpsc::{self, channel},
-        Arc, Mutex,
-    },
+    sync::mpsc::channel,
     thread,
     time::{Duration, Instant, SystemTime},
 };
 
 use m3u8_rs::{MediaPlaylist, Playlist};
-use rodio::decoder::DecoderError;
-use rodio::{cpal, source::Delay};
-use rodio::{Decoder, Devices, OutputStream, OutputStreamHandle, Sink, Source};
+
+use rodio::cpal;
+use rodio::{Decoder, OutputStream, OutputStreamHandle, Sink, Source};
 use tui::widgets::ListState;
 
-use crate::net::download;
+use crate::util::lyrics::Lyrics;
 use crate::util::m3u8::empty_cache;
-use crate::{
-    app,
-    util::lyrics::{Lyric, Lyrics},
-};
 use crate::{m3u8::download_m3u8_playlist, util::net::download_as_bytes};
 
 use super::media::Media;
@@ -159,7 +146,7 @@ impl Player for MusicPlayer {
             super::media::Source::Local(path) => {
                 return self.play_with_file(path, once);
             }
-            super::media::Source::M3u8(path) => false,
+            super::media::Source::M3u8(_path) => false,
         }
     }
 
@@ -448,7 +435,7 @@ impl Player for RadioPlayer {
         match src {
             super::media::Source::Http(_) => false,
             super::media::Source::M3u8(url) => {
-                let (tx, mut rx) = channel();
+                let (tx, rx) = channel();
                 let m3u8_url = url.url.clone();
                 thread::spawn(move || {
                     let playlist = download_m3u8_playlist(m3u8_url);
@@ -472,7 +459,7 @@ impl Player for RadioPlayer {
                             return true;
                         }
                     }
-                    Err(err) => {
+                    Err(_err) => {
                         // ignore
                     }
                 }

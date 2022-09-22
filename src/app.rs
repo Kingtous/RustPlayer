@@ -16,15 +16,14 @@
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::{
-    io::{stdout, Stdout},
+    io::stdout,
     sync::mpsc,
-    thread::{self, sleep_ms},
-    time::{self, Duration, SystemTime},
+    thread::{self},
     vec,
 };
 
 use crossterm::{
-    event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
+    event::{self, Event, KeyCode},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
@@ -33,8 +32,8 @@ use tui::{
     backend::{Backend, CrosstermBackend},
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Style},
-    text::{Span, Text},
-    widgets::{Block, BorderType, Borders, ListState, Paragraph, Widget, Wrap},
+    text::Text,
+    widgets::{Block, BorderType, Borders, ListState, Paragraph, Wrap},
     Frame, Terminal,
 };
 
@@ -42,7 +41,6 @@ use crate::{
     config::Config,
     fs::FsExplorer,
     handler::handle_keyboard_event,
-    main,
     media::player::{MusicPlayer, Player, RadioPlayer},
     ui::{
         fs::draw_fs_tree,
@@ -231,7 +229,7 @@ impl App {
                     // .margin(2)
                     .split(area);
                 // 左侧
-                if (self.active_modules == ActiveModules::RadioList) {
+                if self.active_modules == ActiveModules::RadioList {
                     draw_radio_list(self, frame, main_layout[0]);
                 } else {
                     draw_fs_tree(self, frame, main_layout[0]);

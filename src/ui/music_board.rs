@@ -25,10 +25,7 @@ use tui::{
     Frame,
 };
 
-use crate::{
-    app::{ActiveModules, App},
-    media::player::Player,
-};
+use crate::{app::App, media::player::Player};
 
 use super::{effects::draw_bar_charts_effect, play_list::draw_play_list, progress::draw_progress};
 

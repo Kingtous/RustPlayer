@@ -20,9 +20,9 @@ use std::vec;
 use rand::Rng;
 use tui::{
     backend::Backend,
-    layout::{Alignment, Constraint, Direction, Layout, Rect},
+    layout::{Alignment, Rect},
     style::{Color, Modifier, Style},
-    widgets::{BarChart, Block, BorderType, Borders, List, ListItem, Paragraph},
+    widgets::{BarChart, Block, BorderType, Borders, List, ListItem},
     Frame,
 };
 

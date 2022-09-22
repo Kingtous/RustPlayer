@@ -1,14 +1,13 @@
-use std::fs::{read_dir, File};
+use std::fs::read_dir;
 use std::sync::mpsc;
-use std::sync::mpsc::RecvTimeoutError;
+
 use std::thread;
 use std::time::Duration;
-use std::{fmt::format, fs};
 
-use failure::{format_err, Error};
-use m3u8_rs::{MediaPlaylist, Playlist};
+use failure::format_err;
+use m3u8_rs::Playlist;
 
-use crate::net::{download, DownloadTimeoutError};
+use crate::net::download;
 
 pub fn download_m3u8_playlist(url: String) -> Result<Playlist, failure::Error> {
     let (tx, rx) = mpsc::channel();
@@ -18,7 +17,7 @@ pub fn download_m3u8_playlist(url: String) -> Result<Playlist, failure::Error> {
         let playlist = m3u8_rs::parse_playlist(data.as_bytes());
         match playlist {
             Ok(list) => Ok(list.1),
-            Err(err) => Err(format_err!("Parse Playlist Failed")),
+            Err(_err) => Err(format_err!("Parse Playlist Failed")),
         }
     } else {
         println!("{:?}", resp);

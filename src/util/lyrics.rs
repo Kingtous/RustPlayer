@@ -15,14 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
-use std::{
-    fmt::Display,
-    fs::File,
-    io::Read,
-    path::{Path, PathBuf},
-    time::Duration,
-    vec,
-};
+use std::{fmt::Display, fs::File, io::Read, path::PathBuf, time::Duration, vec};
 
 use regex::Regex;
 

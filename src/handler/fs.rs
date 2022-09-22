@@ -28,7 +28,6 @@ use crate::{
         media::{Media, Source},
         player::Player,
     },
-    ui::fs,
 };
 
 fn add_media_to_player(app: &mut App, once: bool) -> bool {

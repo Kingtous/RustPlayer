@@ -15,14 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
-use std::time::Duration;
-
 use tui::{
     backend::Backend,
     layout::{Constraint, Layout, Rect},
     style::{Color, Modifier, Style},
-    symbols::{self, line::Set, Marker},
-    widgets::{Block, BorderType, Borders, Gauge, LineGauge},
+    symbols::{self},
+    widgets::LineGauge,
     Frame,
 };
 

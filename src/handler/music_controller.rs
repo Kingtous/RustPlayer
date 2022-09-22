@@ -15,14 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
-use std::cmp::max;
-
 use crossterm::event::KeyCode;
 
-use crate::{
-    app::{ActiveModules, App},
-    media::player::Player,
-};
+use crate::{app::App, media::player::Player};
 
 pub fn handle_music_controller(app: &mut App, code: KeyCode) -> bool {
     // if app.active_modules != ActiveModules::MusicController {
