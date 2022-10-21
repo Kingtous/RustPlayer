@@ -37,10 +37,9 @@ identifier = "cn.kingtous.rustplayer"
 version = "1.1.1"
 # resources = ["assets", "images/**/*.png", "secrets/public_key.txt"]
 copyright = "Copyright (c) Kingtous 2022. All rights reserved."
-category = "Multimedia"
+category = "Music"
 short_description = "Music/Radio Player built by Rust."
 long_description = """
 Music/Radio Player built by Rust.
 """
-deb_depends = ["libasound2", "libsdl2-2.0-0 (>= 2.0.5)"]
-osx_frameworks = ["SDL2"]
+deb_depends = ["libasound2"]
