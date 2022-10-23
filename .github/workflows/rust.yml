@@ -106,7 +106,7 @@ jobs:
 
     - name: build RustPlayer
       run: |
-        vcpkg install
+        vcpkg install ffmpeg:x64-windows-static-md
         cargo build --release
 
     - name: Publish Release
