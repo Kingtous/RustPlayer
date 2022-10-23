@@ -63,7 +63,7 @@ jobs:
       run: |
         npm install --global create-dmg
         for name in target/release/bundle/osx/*.app; do
-          create-dmg $name
+          create-dmg $name || true
         done
 
     - name: Publish Release for linux
