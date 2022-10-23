@@ -43,3 +43,6 @@ long_description = """
 Music/Radio Player built by Rust.
 """
 deb_depends = ["libasound2"]
+
+[profile]
+release = { strip = "symbols", lto = "thin", opt-level = "z" }

@@ -18,7 +18,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-
+  VCPKG_COMMIT_ID: 94ce0dab56f4d8ba6bd631ba59ed682b02d45c46
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -52,11 +52,11 @@ jobs:
       if: matrix.os == 'macos-latest'
       run: brew install ffmpeg@4 pkg-config && brew link ffmpeg@4
 
-    - name: build RustPlayer
-      run: cargo build --release
+    - name: Install cargo bundle
+      run: cargo install cargo-bundle
 
-    - name: Test
-      run: cargo test
+    - name: build RustPlayer
+      run: cargo bundle
 
     - name: Upload binaries to release
       uses: actions/upload-artifact@v2
@@ -69,7 +69,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - { sys: mingw64, env: x86_64, artifact_name: Output/rustplayer-setup.exe , asset_name: rustplayer-setup-x86_64.exe }
+          - { sys: mingw64, env: x86_64, artifact_name: target/release/RustPlayer.exe , asset_name: RustPlayer-windows-x86_64.exe }
           # - { sys: mingw32, env: i686, artifact_name: target/release/RustPlayer.exe , asset_name: RustPlayer-windows-x86.exe }
           # - { sys: ucrt64,  env: ucrt-x86_64 }  # Experimental!
           # - { sys: clang64, env: clang-x86_64 } # Experimental!
@@ -78,32 +78,20 @@ jobs:
     #     shell: msys2 {0}
     steps:
     - uses: actions/checkout@v2
-    - name: Install msys2 for windows
-      uses: msys2/setup-msys2@v2
-      with:
-        location: D:\\
-        msystem: ${{matrix.sys}}
-        # update: true
-        install: >-
-          mingw-w64-${{matrix.env}}-ffmpeg
-          mingw-w64-${{matrix.env}}-llvm
-          mingw-w64-${{matrix.env}}-clang
-          mingw-w64-${{matrix.env}}-pkg-config
-          mingw-w64-${{matrix.env}}-rust
+
+    - name: setup vcpkg (do not install any package)
+      uses: lukka/run-vcpkg@v10
+        with:
+          vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
+
+    - name: Install ffmpeg static
+      run: |
+          $VCPKG_ROOT/vcpkg ffmpeg:x64-windows-static-md
+      shell: bash
 
     - name: build RustPlayer
       run: |
-        set MSYSTEM=MINGW64
-        msys2 -c 'cargo build --release'
-
-    - name: package RustPlayer using Inno
-      run: |
-        iscc.exe setup.iss
-
-    - name: Test
-      run: |
-        set MSYSTEM=MINGW64
-        msys2 -c 'cargo test'
+        cargo build --release
 
     - name: Upload binaries to release
       uses: actions/upload-artifact@v2
