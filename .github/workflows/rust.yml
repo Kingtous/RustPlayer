@@ -20,6 +20,7 @@ env:
   CARGO_TERM_COLOR: always
   VCPKG_COMMIT_ID: 94ce0dab56f4d8ba6bd631ba59ed682b02d45c46
   TAG_NAME: latest
+  VERSION: "1.1.1"
   
 jobs:
   build:
@@ -65,7 +66,7 @@ jobs:
       run: |
         npm install --global create-dmg
         for name in target/release/bundle/osx/*.app; do
-          create-dmg $name || true
+          create-dmg $name rustplayer-${{ env.VERSION }}.dmg || true
         done
 
     - name: Publish Release for linux
@@ -116,11 +117,16 @@ jobs:
         $VCPKG_ROOT/vcpkg install ffmpeg:x64-windows-static-md
         cargo build --release
 
+    - name: rename
+      shell: bash
+      run: |
+        mv target/release/rustplayer.exe target/release/rustplayer-${{ env.VERSION }}.exe
+
     - name: Publish Release
       uses: softprops/action-gh-release@v1
       with:
         prerelease: ${{ env.TAG_NAME }} == "latest"
         tag_name: ${{ env.TAG_NAME }}
         files: |
-          target/release/rustplayer.exe
+          target/release/rustplayer*.exe
 
