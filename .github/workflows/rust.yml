@@ -103,11 +103,7 @@ jobs:
       uses: lukka/run-vcpkg@v10
       with:
         vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
-
-    - name: Install ffmpeg static
-      run: |
-          $VCPKG_ROOT/vcpkg install ffmpeg:x64-windows-static-md
-      shell: bash
+	runVcpkgInstall: true
 
     - name: build RustPlayer
       run: |
