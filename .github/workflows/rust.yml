@@ -28,14 +28,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, macOS-10.15] 
+        os: [ubuntu-20.04, macOS-latest] 
         include:
           - name: linux
             os: ubuntu-20.04
             artifact_name: target/release/RustPlayer
             asset_name: RustPlayer-linux-amd64
           - name: macos
-            os: macos-10.15
+            os: macOS-latest
             artifact_name: target/release/RustPlayer
             asset_name: RustPlayer-macos
     steps:
@@ -51,7 +51,7 @@ jobs:
       run: sudo apt update && sudo apt install -y libasound2-dev libavcodec-dev libavformat-dev libswresample-dev libavutil-dev libavformat-dev pkg-config
         
     - name: install ffmpeg deps for macOS
-      if: matrix.os == 'macos-10.15'
+      if: matrix.os == 'macOS-latest'
       run: brew install ffmpeg@4 pkg-config && brew link ffmpeg@4
 
     - name: Install cargo bundle
@@ -61,7 +61,7 @@ jobs:
       run: cargo bundle --release
 
     - name: bundle RustPlayer for macos
-      if: matrix.os == 'macos-10.15'
+      if: matrix.os == 'macOS-latest'
       run: |
         npm install --global create-dmg
         for name in target/release/bundle/osx/*.app; do
@@ -77,7 +77,7 @@ jobs:
           target/release/bundle/deb/*.deb
 
     - name: Publish Release for macos
-      if: matrix.os == 'macos-10.15'
+      if: matrix.os == 'macOS-latest'
       uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ env.TAG_NAME }}
