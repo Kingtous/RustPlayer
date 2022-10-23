@@ -2,6 +2,8 @@ name: Rust
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
   push:
     paths-ignore: 
       - 'README.md'
@@ -16,58 +18,83 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-
+  VCPKG_COMMIT_ID: 94ce0dab56f4d8ba6bd631ba59ed682b02d45c46
+  TAG_NAME: latest
+  VERSION: "1.1.1"
+  
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    continue-on-error: true
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-18.04, macOS-latest] 
+        os: [ubuntu-20.04, macOS-latest] 
         include:
           - name: linux
-            os: ubuntu-18.04
+            os: ubuntu-20.04
             artifact_name: target/release/RustPlayer
             asset_name: RustPlayer-linux-amd64
           - name: macos
-            os: macos-latest
+            os: macOS-latest
             artifact_name: target/release/RustPlayer
             asset_name: RustPlayer-macos
-          # - name: windows
-          #   os: windows-latest
-          #   artifact_name: target/release/RustPlayer.exe
-          #   asset_name: RustPlayer-windows.exe
     steps:
     - uses: actions/checkout@v2
-    - uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
+    - name: patch dynamic build
+      run: git apply dynamic-lib.patch
+
+    - run: rustup toolchain install stable --profile minimal
+    - uses: Swatinem/rust-cache@v2
 
     - name: install deps for linux
-      if: matrix.os == 'ubuntu-18.04'
+      if: matrix.os == 'ubuntu-20.04'
       run: sudo apt update && sudo apt install -y libasound2-dev libavcodec-dev libavformat-dev libswresample-dev libavutil-dev libavformat-dev pkg-config
         
     - name: install ffmpeg deps for macOS
-      if: matrix.os == 'macos-latest'
+      if: matrix.os == 'macOS-latest'
       run: brew install ffmpeg@4 pkg-config && brew link ffmpeg@4
 
+    - name: Install cargo bundle
+      run: cargo install cargo-bundle
+
     - name: build RustPlayer
-      run: cargo build --release
+      run: cargo bundle --release
 
-    - name: Test
-      run: cargo test
+    - name: bundle RustPlayer for macos
+      if: matrix.os == 'macOS-latest'
+      run: |
+        npm install --global create-dmg
+        for name in target/release/bundle/osx/*.app; do
+          create-dmg $name || true
+        done
 
-    - name: Upload binaries to release
-      uses: actions/upload-artifact@v2
+    - name: Publish Release for linux
+      if: matrix.os == 'ubuntu-20.04'
+      uses: softprops/action-gh-release@v1
       with:
-        name: ${{ matrix.asset_name }}
-        path: ${{ matrix.artifact_name }}
+        prerelease: true
+        tag_name: ${{ env.TAG_NAME }}
+        files: |
+          target/release/bundle/deb/*.deb
+
+    - name: Publish Release for macos
+      if: matrix.os == 'macOS-latest'
+      uses: softprops/action-gh-release@v1
+      with:
+        prerelease: true
+        tag_name: ${{ env.TAG_NAME }}
+        files: |
+          *.dmg
 
   build-on-windows:
     runs-on: windows-latest
+    continue-on-error: true
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - { sys: mingw64, env: x86_64, artifact_name: Output/rustplayer-setup.exe , asset_name: rustplayer-setup-x86_64.exe }
+          - { sys: mingw64, env: x86_64, artifact_name: target/release/RustPlayer.exe , asset_name: RustPlayer-windows-x86_64.exe }
           # - { sys: mingw32, env: i686, artifact_name: target/release/RustPlayer.exe , asset_name: RustPlayer-windows-x86.exe }
           # - { sys: ucrt64,  env: ucrt-x86_64 }  # Experimental!
           # - { sys: clang64, env: clang-x86_64 } # Experimental!
@@ -76,36 +103,30 @@ jobs:
     #     shell: msys2 {0}
     steps:
     - uses: actions/checkout@v2
-    - name: Install msys2 for windows
-      uses: msys2/setup-msys2@v2
+    - run: rustup toolchain install stable --profile minimal
+    - uses: Swatinem/rust-cache@v2
+
+    - name: setup vcpkg (do not install any package)
+      uses: lukka/run-vcpkg@v10
       with:
-        location: D:\\
-        msystem: ${{matrix.sys}}
-        # update: true
-        install: >-
-          mingw-w64-${{matrix.env}}-ffmpeg
-          mingw-w64-${{matrix.env}}-llvm
-          mingw-w64-${{matrix.env}}-clang
-          mingw-w64-${{matrix.env}}-pkg-config
-          mingw-w64-${{matrix.env}}-rust
+        vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
 
     - name: build RustPlayer
+      shell: bash
       run: |
-        set MSYSTEM=MINGW64
-        msys2 -c 'cargo build --release'
+        $VCPKG_ROOT/vcpkg install ffmpeg:x64-windows-static-md
+        cargo build --release
 
-    - name: package RustPlayer using Inno
+    - name: rename
+      shell: bash
       run: |
-        iscc.exe setup.iss
+        mv target/release/rustplayer.exe target/release/rustplayer-${{ env.VERSION }}.exe
 
-    - name: Test
-      run: |
-        set MSYSTEM=MINGW64
-        msys2 -c 'cargo test'
-
-    - name: Upload binaries to release
-      uses: actions/upload-artifact@v2
+    - name: Publish Release
+      uses: softprops/action-gh-release@v1
       with:
-        name: ${{ matrix.asset_name }}
-        path: ${{ matrix.artifact_name }}
+        prerelease: true
+        tag_name: ${{ env.TAG_NAME }}
+        files: |
+          target/release/rustplayer*.exe
 

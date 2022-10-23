@@ -1,7 +1,9 @@
 [package]
-name = "RustPlayer"
-version = "1.1.0"
+name = "rustplayer"
+version = "1.1.1"
 edition = "2021"
+description = "Music/Radio Player built by Rust"
+authors = ["Kingtous"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -28,3 +30,21 @@ dirs = "4.0.0"
 
 bytes = "1.1.0"
 ffmpeg-decoder = {features = ["rodio_source"], path = "thirdparty/ffmpeg-decoder-rs"}
+
+[package.metadata.bundle]
+name = "RustPlayer"
+identifier = "cn.kingtous.rustplayer"
+# icon = ["32x32.png", "128x128.png", "128x128@2x.png"]
+version = "1.1.1"
+# resources = ["assets", "images/**/*.png", "secrets/public_key.txt"]
+copyright = "Copyright (c) Kingtous 2022. All rights reserved."
+category = "Music"
+short_description = "Music/Radio Player built by Rust."
+long_description = """
+Music/Radio Player built by Rust.
+"""
+deb_depends = ["libasound2", "libavcodec57 | libavcodec58", "libavformat57 | libavformat58", "libswresample2 | libswresample3"]
+osx_minimum_system_version = "10.15"
+
+[profile]
+release = { strip = "symbols", lto = "thin", opt-level = "z" }

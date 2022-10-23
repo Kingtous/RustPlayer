@@ -1,0 +1,13 @@
+{
+  "name": "rustplayer",
+  "version-string": "1.1.1",
+  "port-version": 1,
+  "homepage": "https://github.com/kingtous/RustPlayer",
+  "description": "Music/Radio Player",
+  "dependencies": [
+    {
+      "name": "ffmpeg:x64-windows-static-md",
+      "platform": "windows"
+    }
+  ]
+}

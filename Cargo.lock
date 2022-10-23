@@ -3,26 +3,6 @@
 version = 3
 
 [[package]]
-name = "RustPlayer"
-version = "1.1.0"
-dependencies = [
- "bytes",
- "crossterm 0.23.0",
- "dirs",
- "failure",
- "ffmpeg-decoder",
- "m3u8-rs",
- "mp3-duration",
- "open",
- "rand",
- "regex",
- "reqwest",
- "rodio",
- "tokio",
- "tui",
-]
-
-[[package]]
 name = "addr2line"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -437,8 +417,7 @@ dependencies = [
 [[package]]
 name = "ffmpeg-sys-next"
 version = "4.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "de57234f2c49c6e093fe67bbbaa9142c228f6e2d5533ef27980993d5b6adef2a"
+source = "git+https://github.com/Kingtous/rust-ffmpeg-sys.git?branch=fix/4.4.0#2c8b92401886d8a6d3b94e77fd73c84e95c627ee"
 dependencies = [
  "bindgen 0.54.0",
  "cc",
@@ -1432,6 +1411,26 @@ name = "rustc-hash"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "08d43f7aa6b08d49f382cde6a7982047c3426db949b1424bc4b7ec9ae12c6ce2"
+
+[[package]]
+name = "rustplayer"
+version = "1.1.1"
+dependencies = [
+ "bytes",
+ "crossterm 0.23.0",
+ "dirs",
+ "failure",
+ "ffmpeg-decoder",
+ "m3u8-rs",
+ "mp3-duration",
+ "open",
+ "rand",
+ "regex",
+ "reqwest",
+ "rodio",
+ "tokio",
+ "tui",
+]
 
 [[package]]
 name = "ryu"
