@@ -20,12 +20,11 @@ env:
   CARGO_TERM_COLOR: always
   VCPKG_COMMIT_ID: 94ce0dab56f4d8ba6bd631ba59ed682b02d45c46
   TAG_NAME: latest
-  CONTINUE_ON_ERROR: true
   
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ env.CONTINUE_ON_ERROR }}
+    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
@@ -87,7 +86,7 @@ jobs:
 
   build-on-windows:
     runs-on: windows-latest
-    continue-on-error: ${{ env.CONTINUE_ON_ERROR }}
+    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
