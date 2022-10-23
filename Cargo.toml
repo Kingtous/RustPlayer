@@ -44,7 +44,6 @@ long_description = """
 Music/Radio Player built by Rust.
 """
 deb_depends = ["libasound2", "libavcodec57 | libavcodec58", "libavformat57 | libavformat58", "libswresample2 | libswresample3"]
-osx_frameworks = ["SDL2"]
 osx_minimum_system_version = "10.15"
 
 [profile]
