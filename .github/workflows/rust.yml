@@ -56,7 +56,14 @@ jobs:
       run: brew install ffmpeg@4 pkg-config && brew link ffmpeg@4
 
     - name: Install cargo bundle
-      run: cargo install cargo-bundle
+      shell: bash
+      run: |
+        pushd /tmp
+        git clone https://github.com/Kingtous/cargo-bundle
+          pushd cargo-bundle
+            cargo install --path .
+          popd
+        popd
 
     - name: build RustPlayer
       run: cargo bundle --release
