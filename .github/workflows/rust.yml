@@ -62,7 +62,7 @@ jobs:
       if: matrix.os == 'macos-latest'
       run: |
         npm install --global create-dmg
-        for name in target/debug/bundle/osx/*.app; do
+        for name in target/release/bundle/osx/*.app; do
           create-dmg $name
         done
 
@@ -72,7 +72,7 @@ jobs:
       with:
         tag_name: ${{ env.TAG_NAME }}
         files: |
-          target/debug/bundle/deb/*.deb
+          target/release/bundle/deb/*.deb
 
     - name: Publish Release for macos
       if: matrix.os == 'macos-latest'
