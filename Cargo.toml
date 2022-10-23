@@ -1,8 +1,9 @@
 [package]
-name = "RustPlayer"
+name = "rustplayer"
 version = "1.1.1"
 edition = "2021"
 description = "Music/Radio Player built by Rust"
+authors = ["Kingtous"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -42,7 +43,9 @@ short_description = "Music/Radio Player built by Rust."
 long_description = """
 Music/Radio Player built by Rust.
 """
-deb_depends = ["libasound2"]
+deb_depends = ["libasound2", "libavcodec57 | libavcodec58", "libavformat57 | libavformat58", "libswresample2 | libswresample3"]
+osx_frameworks = ["SDL2"]
+osx_minimum_system_version = "10.15"
 
 [profile]
 release = { strip = "symbols", lto = "thin", opt-level = "z" }

@@ -19,6 +19,8 @@ on:
 env:
   CARGO_TERM_COLOR: always
   VCPKG_COMMIT_ID: 94ce0dab56f4d8ba6bd631ba59ed682b02d45c46
+  TAG_NAME: latest
+  
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -36,6 +38,9 @@ jobs:
             asset_name: RustPlayer-macos
     steps:
     - uses: actions/checkout@v2
+    - name: patch dynamic build
+      run: git apply dynamic-lib.patch
+
     - run: rustup toolchain install stable --profile minimal
     - uses: Swatinem/rust-cache@v2
 
@@ -51,13 +56,31 @@ jobs:
       run: cargo install cargo-bundle
 
     - name: build RustPlayer
-      run: cargo bundle
+      run: cargo bundle --release
 
-    - name: Upload binaries to release
-      uses: actions/upload-artifact@v2
+    - name: bundle RustPlayer for macos
+      if: matrix.os == 'macos-latest'
+      run: |
+        npm install --global create-dmg
+        for name in target/debug/bundle/osx/*.app; do
+          create-dmg $name
+        done
+
+    - name: Publish Release for linux
+      if: matrix.os == 'ubuntu-20.04'
+      uses: softprops/action-gh-release@v1
       with:
-        name: ${{ matrix.asset_name }}
-        path: ${{ matrix.artifact_name }}
+        tag_name: ${{ env.TAG_NAME }}
+        files: |
+          target/debug/bundle/deb/*.deb
+
+    - name: Publish Release for macos
+      if: matrix.os == 'macos-latest'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ env.TAG_NAME }}
+        files: |
+          *.dmg
 
   build-on-windows:
     runs-on: windows-latest
