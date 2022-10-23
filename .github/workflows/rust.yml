@@ -72,6 +72,7 @@ jobs:
       if: matrix.os == 'ubuntu-20.04'
       uses: softprops/action-gh-release@v1
       with:
+        prerelease: ${{ env.TAG_NAME }} == "latest"
         tag_name: ${{ env.TAG_NAME }}
         files: |
           target/release/bundle/deb/*.deb
