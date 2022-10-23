@@ -113,9 +113,10 @@ jobs:
       run: |
         cargo build --release
 
-    - name: Upload binaries to release
-      uses: actions/upload-artifact@v2
+    - name: Publish Release
+      uses: softprops/action-gh-release@v1
       with:
-        name: ${{ matrix.asset_name }}
-        path: ${{ matrix.artifact_name }}
+        tag_name: ${{ env.TAG_NAME }}
+        files: |
+          target/release/rustplayer.exe
 
