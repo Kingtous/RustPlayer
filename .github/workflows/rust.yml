@@ -24,28 +24,23 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04, macOS-latest] 
+        os: [ubuntu-20.04, macOS-latest] 
         include:
           - name: linux
-            os: ubuntu-18.04
+            os: ubuntu-20.04
             artifact_name: target/release/RustPlayer
             asset_name: RustPlayer-linux-amd64
           - name: macos
             os: macos-latest
             artifact_name: target/release/RustPlayer
             asset_name: RustPlayer-macos
-          # - name: windows
-          #   os: windows-latest
-          #   artifact_name: target/release/RustPlayer.exe
-          #   asset_name: RustPlayer-windows.exe
     steps:
     - uses: actions/checkout@v2
-    - uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
+    - run: rustup toolchain install stable --profile minimal
+    - uses: Swatinem/rust-cache@v2
 
     - name: install deps for linux
-      if: matrix.os == 'ubuntu-18.04'
+      if: matrix.os == 'ubuntu-20.04'
       run: sudo apt update && sudo apt install -y libasound2-dev libavcodec-dev libavformat-dev libswresample-dev libavutil-dev libavformat-dev pkg-config
         
     - name: install ffmpeg deps for macOS
@@ -78,6 +73,8 @@ jobs:
     #     shell: msys2 {0}
     steps:
     - uses: actions/checkout@v2
+    - run: rustup toolchain install stable --profile minimal
+    - uses: Swatinem/rust-cache@v2
 
     - name: setup vcpkg (do not install any package)
       uses: lukka/run-vcpkg@v10
@@ -86,7 +83,7 @@ jobs:
 
     - name: Install ffmpeg static
       run: |
-          $VCPKG_ROOT/vcpkg ffmpeg:x64-windows-static-md
+          $VCPKG_ROOT/vcpkg install ffmpeg:x64-windows-static-md
       shell: bash
 
     - name: build RustPlayer
