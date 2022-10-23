@@ -40,7 +40,7 @@ layout:
 
 apps:
   rustplayer:
-    command: bin/RustPlayer
+    command: bin/rustplayer
     plugs:
       - network
       - audio-playback
