@@ -18,6 +18,9 @@ parts:
   rustplayer:
     plugin: rust
     source: .
+    override-pull: |
+      snapcraftctl pull
+      git apply dynamic-lib.patch
     build-packages:
       - libasound2-dev
       - libavcodec-dev
@@ -27,6 +30,7 @@ parts:
       - pkg-config
       - libssl-dev
       - clang
+      - git
     stage-packages:
       - libasound2
       - libavcodec57 
