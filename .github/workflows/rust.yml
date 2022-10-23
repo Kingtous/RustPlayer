@@ -80,6 +80,7 @@ jobs:
       if: matrix.os == 'macOS-latest'
       uses: softprops/action-gh-release@v1
       with:
+        prerelease: ${{ env.TAG_NAME }} == "latest"
         tag_name: ${{ env.TAG_NAME }}
         files: |
           *.dmg
@@ -117,6 +118,7 @@ jobs:
     - name: Publish Release
       uses: softprops/action-gh-release@v1
       with:
+        prerelease: ${{ env.TAG_NAME }} == "latest"
         tag_name: ${{ env.TAG_NAME }}
         files: |
           target/release/rustplayer.exe
