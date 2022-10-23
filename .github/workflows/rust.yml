@@ -81,8 +81,8 @@ jobs:
 
     - name: setup vcpkg (do not install any package)
       uses: lukka/run-vcpkg@v10
-        with:
-          vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
+      with:
+        vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
 
     - name: Install ffmpeg static
       run: |
