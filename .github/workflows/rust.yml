@@ -33,7 +33,7 @@ jobs:
             artifact_name: target/release/RustPlayer
             asset_name: RustPlayer-linux-amd64
           - name: macos
-            os: macos-latest
+            os: macos-10.15
             artifact_name: target/release/RustPlayer
             asset_name: RustPlayer-macos
     steps:
