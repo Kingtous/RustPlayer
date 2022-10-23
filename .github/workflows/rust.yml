@@ -103,10 +103,10 @@ jobs:
       uses: lukka/run-vcpkg@v10
       with:
         vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
-	runVcpkgInstall: true
 
     - name: build RustPlayer
       run: |
+        vcpkg install
         cargo build --release
 
     - name: Publish Release
