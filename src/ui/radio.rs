@@ -35,13 +35,12 @@ impl RadioExplorer {
         config_dir.push("radio.ini");
         let f: File;
         if !config_dir.as_path().exists() {
-            f = File::create(config_dir).unwrap();
-        } else {
-            f = File::open(config_dir).unwrap();
-        }
+            File::create(config_dir.clone()).unwrap();
+        } 
+        f = File::open(config_dir).unwrap();
         let reader = BufReader::new(f);
-        let lines = reader.lines().map(|i| i.unwrap_or("".to_string()));
-        for line in lines {
+        let mut lines = reader.lines().map(|i| i.unwrap());
+        while let Some(line) = lines.next() {
             if line.is_empty() {
                 continue;
             }
