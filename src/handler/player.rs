@@ -27,7 +27,7 @@ pub fn handle_player(app: &mut App, code: KeyCode) -> bool {
             app.player.set_volume(new_volume);
             return true;
         }
-        KeyCode::Char('=') => {
+        KeyCode::Char('=') | KeyCode::Char('+') => {
             let volume = app.player.volume() + 0.05;
             let new_volume = volume.min(1.0);
             app.player.set_volume(new_volume);
@@ -47,7 +47,7 @@ pub fn handle_radio(app: &mut App, code: KeyCode) -> bool {
             app.radio.set_volume(new_volume);
             return true;
         }
-        KeyCode::Char('=') => {
+        KeyCode::Char('=') | KeyCode::Char('+') => {
             let volume = app.radio.volume() + 0.05;
             let new_volume = volume.min(1.0);
             app.radio.set_volume(new_volume);

@@ -54,7 +54,6 @@ use crate::{
 
 pub enum InputMode {
     Normal,
-    Editing,
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -120,8 +119,8 @@ impl App {
         let tick = self.config.tick_gap.clone();
         thread::spawn(move || loop {
             thread::sleep(tick);
-            sd.send(EventType::Player);
-            sd.send(EventType::Radio);
+            sd.send(EventType::Player).unwrap();
+            sd.send(EventType::Radio).unwrap();
         });
         // start event
         loop {
@@ -136,8 +135,7 @@ impl App {
                             code => {
                                 handle_keyboard_event(self, code);
                             }
-                        },
-                        InputMode::Editing => {}
+                        }
                     }
                 }
             }
@@ -186,7 +184,7 @@ impl App {
             match route {
                 Routes::Main => {
                     self.draw_header(frame, chunks[0]);
-                    self.draw_body(frame, chunks[1]);
+                    self.draw_body(frame, chunks[1]).unwrap();
                 }
                 Routes::Help => {
                     self.draw_header(frame, chunks[0]);

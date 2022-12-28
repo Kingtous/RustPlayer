@@ -142,7 +142,6 @@ impl Player for MusicPlayer {
 
     fn add_to_list(&mut self, media: Media, once: bool) -> bool {
         match media.src {
-            super::media::Source::Http(_) => false,
             super::media::Source::Local(path) => {
                 return self.play_with_file(path, once);
             }
@@ -394,6 +393,7 @@ pub struct RadioItem {
     url: String,
 }
 
+#[allow(dead_code)]
 pub struct RadioPlayer {
     pub item: Option<RadioItem>,
     pub list: Vec<PlayListItem>,
@@ -433,7 +433,6 @@ impl Player for RadioPlayer {
         self.last_playing_id = -1;
         let src = media.src;
         match src {
-            super::media::Source::Http(_) => false,
             super::media::Source::M3u8(url) => {
                 let (tx, rx) = channel();
                 let m3u8_url = url.url.clone();

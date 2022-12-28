@@ -68,7 +68,7 @@ where
         .constraints([Constraint::Percentage(55), Constraint::Percentage(45)])
         .split(area);
 
-    let mut playing_text = "".to_string();
+    let playing_text;
     if let Some(item) = player.playing_song() {
         playing_text = String::from(item.name.as_str());
     } else {

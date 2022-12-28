@@ -69,7 +69,7 @@ pub fn handle_routes(app: &mut App, key: KeyCode) -> bool {
 }
 
 pub fn handle_keyboard_event(app: &mut App, key: KeyCode) {
-    let mut flag = false;
+    let mut flag;
     let top_route = app.route_stack.last().unwrap();
 
     match top_route {

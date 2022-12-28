@@ -39,7 +39,7 @@ fn add_media_to_player(app: &mut App, once: bool) -> bool {
             match selected {
                 0 => match dir.parent() {
                     Some(dir) => {
-                        set_current_dir(dir);
+                        set_current_dir(dir).unwrap();
                         fse.current_path = dir.to_string_lossy().to_string();
                         fse.index.select(Some(0));
                     }
@@ -51,7 +51,7 @@ fn add_media_to_player(app: &mut App, once: bool) -> bool {
                     let dir_entry = &fse.dirs[num - 1];
                     let path = dir_entry.path();
                     fse.current_path = String::from(path.to_string_lossy());
-                    set_current_dir(path);
+                    set_current_dir(path).unwrap();
                     fse.index.select(Some(0));
                 }
             }
@@ -87,7 +87,6 @@ fn add_media_to_player(app: &mut App, once: bool) -> bool {
             }
             return res;
         }
-        return true;
     } else {
         fse.index.select(Some(0));
         return false;

@@ -17,8 +17,8 @@
 
 use crate::ui::radio::RadioConfig;
 
+
 pub enum Source {
-    Http(String),
     M3u8(RadioConfig),
     Local(String),
 }
