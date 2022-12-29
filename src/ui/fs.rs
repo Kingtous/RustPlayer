@@ -32,6 +32,7 @@ use tui::Frame;
 use crate::app::ActiveModules;
 use crate::App;
 
+#[allow(dead_code)]
 pub struct FsExplorer {
     pub current_path: String,
     pub files: Vec<DirEntry>,

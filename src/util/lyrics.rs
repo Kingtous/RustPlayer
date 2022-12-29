@@ -55,7 +55,7 @@ impl Lyrics {
         let mut buffer = vec![];
         let regex =
             Regex::new(r"\[(?P<min>\d+):(?P<sec>\d+).(?P<ms>\d+)](?P<content>[^\[\]]*)").unwrap();
-        f.read_to_end(&mut buffer);
+        f.read_to_end(&mut buffer).unwrap();
         let m = String::from_utf8(buffer).unwrap();
         let mut lyrics_vec = vec![];
         for cap in regex.captures_iter(m.as_str()) {
@@ -71,6 +71,7 @@ impl Lyrics {
         Self { list: lyrics_vec }
     }
 
+    #[allow(dead_code)]
     pub fn count(&self) -> usize {
         self.list.len()
     }

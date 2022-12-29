@@ -22,13 +22,13 @@ use crate::app::App;
 pub fn handle_help(app: &mut App, code: KeyCode) -> bool {
     match code {
         KeyCode::Enter => {
-            open::that(app.config.home_page);
+            open::that(app.config.home_page).unwrap();
             return true;
         }
         KeyCode::Char('r') => {
             let mut config_dir = dirs::config_dir().unwrap();
             config_dir.push("RustPlayer");
-            open::that(config_dir);
+            open::that(config_dir).unwrap();
             return true;
         }
         _ => {

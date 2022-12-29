@@ -8,7 +8,7 @@ fn fetch_and_play() {
     let src = "http://ngcdn002.cnr.cn/live/jjzs/index.m3u8";
     let (tx, rx) = mpsc::channel();
     thread::spawn(move || {
-        download(&src.to_owned(), &tx);
+        download(&src.to_owned(), &tx).unwrap();
     });
     match rx.recv_timeout(Duration::from_secs(5)) {
         Ok(s) => {

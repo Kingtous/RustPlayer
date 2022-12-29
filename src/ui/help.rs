@@ -25,7 +25,7 @@ use tui::{
     Frame,
 };
 
-use crate::{app::App, media::player::Player};
+use crate::app::App;
 
 pub fn draw_help<B>(_app: &mut App, frame: &mut Frame<B>, area: Rect)
 where

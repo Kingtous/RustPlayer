@@ -33,7 +33,7 @@ pub fn empty_cache() {
         if let Ok(dirs) = it {
             for dir in dirs {
                 if let Ok(d) = dir {
-                    std::fs::remove_file(d.path());
+                    std::fs::remove_file(d.path()).unwrap();
                 }
             }
         }
