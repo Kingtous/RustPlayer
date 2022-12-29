@@ -63,7 +63,9 @@ The screenshot from Deepin
 
 ### macOS
 
-![macOS RustPlayer](https://s2.loli.net/2022/03/03/Z9altpG63qk24W8.png)
+<img width="907" alt="image" src="https://user-images.githubusercontent.com/39793325/209902256-29ee60fa-fb45-439c-838d-cd9f1a34a265.png">
+
+
 
 ## Compile RustPlayer and run
 
