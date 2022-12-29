@@ -119,8 +119,8 @@ impl App {
         let tick = self.config.tick_gap.clone();
         thread::spawn(move || loop {
             thread::sleep(tick);
-            sd.send(EventType::Player).unwrap();
-            sd.send(EventType::Radio).unwrap();
+            let _ = sd.send(EventType::Player);
+            let _ = sd.send(EventType::Radio);
         });
         // start event
         loop {
