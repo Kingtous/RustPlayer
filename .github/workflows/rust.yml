@@ -41,8 +41,8 @@ jobs:
             asset_name: RustPlayer-macos
     steps:
     - uses: actions/checkout@v2
-    - name: patch dynamic build
-      run: git apply dynamic-lib.patch
+    # - name: patch dynamic build
+    #   run: git apply dynamic-lib.patch
 
     - run: rustup toolchain install stable --profile minimal
     - uses: Swatinem/rust-cache@v2
@@ -65,10 +65,16 @@ jobs:
           popd
         popd
 
-    - name: build RustPlayer
+    - name: build RustPlayer for macOS
+      if: matrix.os == 'macOS-latest'
+      env: 
+        PKG_CONFIG_PATH: /usr/local/opt/ffmpeg@4/lib/pkgconfig
       run: cargo bundle --release
 
-    - name: bundle RustPlayer for macos
+    - name: build RustPlayer for Linux
+      run: cargo bundle --release
+
+    - name: bundle RustPlayer for macOS
       if: matrix.os == 'macOS-latest'
       run: |
         npm install --global create-dmg
