@@ -135,7 +135,7 @@ impl App {
                             code => {
                                 handle_keyboard_event(self, code);
                             }
-                        }
+                        },
                     }
                 }
             }

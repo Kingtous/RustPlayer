@@ -36,7 +36,7 @@ impl RadioExplorer {
         let f: File;
         if !config_dir.as_path().exists() {
             File::create(config_dir.clone()).unwrap();
-        } 
+        }
         f = File::open(config_dir).unwrap();
         let reader = BufReader::new(f);
         let mut lines = reader.lines().map(|i| i.unwrap());
