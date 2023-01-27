@@ -3,6 +3,7 @@
 ![build status](https://github.com/Kingtous/RustPlayer/actions/workflows/rust.yml/badge.svg)
 [![rustplayer](https://snapcraft.io/rustplayer/badge.svg)](https://snapcraft.io/rustplayer)
 [![rustplayer](https://snapcraft.io/rustplayer/trending.svg?name=0)](https://snapcraft.io/rustplayer)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FKingtous%2FRustPlayer.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FKingtous%2FRustPlayer?ref=badge_shield)
 
 [![Linux](https://svgshare.com/i/Zhy.svg)](https://svgshare.com/i/Zhy.svg)
 [![macOS](https://svgshare.com/i/ZjP.svg)](https://svgshare.com/i/ZjP.svg)
@@ -115,3 +116,7 @@ options snd_hda_intel index=1
 ```
 
 reboot and check if it works.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FKingtous%2FRustPlayer.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FKingtous%2FRustPlayer?ref=badge_large)
