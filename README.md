@@ -32,10 +32,6 @@ RustPlayer is under development. If u have encountered any problem, please open 
 - Adjust volume
 - Developed by Kingtous
 
-## Demo Video
-
-- [Bilibili Video](https://www.bilibili.com/video/BV1T34y1k7Xf)
-
 
 ## Install RustPlayer by Snap Store
 
