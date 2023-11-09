@@ -13,7 +13,7 @@ rand = "0.8.5"
 tui = "0.19.0"
 crossterm = "0.25.0"
 
-rodio = { version = "0.15.0", features = ["mp3", "wav", "flac"] }
+rodio = { version = "0.17", features = ["mp3", "wav", "flac"] }
 mp3-duration = "0.1.10"
 
 failure = "0.1.8"
@@ -33,11 +33,11 @@ ffmpeg-decoder = {features = ["rodio_source"], path = "thirdparty/ffmpeg-decoder
 
 [package.metadata.bundle]
 name = "RustPlayer"
-identifier = "cn.kingtous.rustplayer"
+identifier = "cc.ketanetwork.rustplayer"
 # icon = ["32x32.png", "128x128.png", "128x128@2x.png"]
-version = "1.1.1"
+version = "1.1.2"
 # resources = ["assets", "images/**/*.png", "secrets/public_key.txt"]
-copyright = "Copyright (c) Kingtous 2022. All rights reserved."
+copyright = "Copyright (c) KetaNetwork 2023. All rights reserved."
 category = "Music"
 short_description = "Music/Radio Player built by Rust."
 long_description = """

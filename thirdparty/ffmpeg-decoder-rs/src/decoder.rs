@@ -3,7 +3,7 @@ use crate::error::Error;
 use ffmpeg_sys_next::{
     self, av_frame_alloc, av_frame_free, av_frame_unref, av_freep, av_get_alt_sample_fmt,
     av_get_bytes_per_sample, av_get_channel_layout_nb_channels, av_get_sample_fmt_name,
-    av_init_packet, av_packet_unref, av_read_frame, av_register_all, av_sample_fmt_is_planar,
+    av_init_packet, av_packet_unref, av_read_frame, av_sample_fmt_is_planar,
     av_samples_alloc, av_samples_get_buffer_size, avcodec_alloc_context3, avcodec_close,
     avcodec_find_decoder, avcodec_free_context, avcodec_open2, avcodec_parameters_to_context,
     avcodec_receive_frame, avcodec_send_packet, avformat_close_input, avformat_find_stream_info,
@@ -36,7 +36,8 @@ pub struct Decoder {
 
 impl Decoder {
     pub fn open(path: impl AsRef<Path>) -> Result<Decoder, Error> {
-        unsafe { av_register_all() };
+        // Note: No need to register av for newer ffmpeg (>4).
+        // unsafe { av_register_all() };
 
         // Open the file and get the format context
         let format_ctx = FormatContext::open(&path.as_ref().display().to_string())?;
@@ -450,7 +451,7 @@ impl Stream {
         let codec_params = unsafe { self.inner.as_ref().unwrap().codecpar };
         let codec_id = unsafe { codec_params.as_ref().unwrap().codec_id };
 
-        let codec: *mut AVCodec = unsafe { avcodec_find_decoder(codec_id) };
+        let codec: *mut AVCodec = unsafe { avcodec_find_decoder(codec_id) as _ };
         if codec.is_null() {
             return Err(Error::NullCodec);
         }

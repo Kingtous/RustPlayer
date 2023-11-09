@@ -20,12 +20,12 @@ default = []
 rodio_source = ['rodio']
 
 [dependencies]
-ffmpeg-sys-next = { git="https://github.com/Kingtous/rust-ffmpeg-sys.git", branch="fix/4.4.0", default-features=false, features=["avcodec", "avformat", "swresample", "static"] }
+ffmpeg-sys-next = { git="https://github.com/KetaDotCC/rust-ffmpeg-sys.git", branch="master", default-features=false, features=["avcodec", "avformat", "swresample", "static"] }
 
 thiserror = "1.0"
 log = "0.4"
 
-rodio = { version = "0.15.0", default-features=false, optional=true }
+rodio = { version = "0.17.0", default-features=false, optional=true }
 
 [workspace]
 members = [
