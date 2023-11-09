@@ -128,7 +128,7 @@ jobs:
     - name: build RustPlayer
       shell: bash
       run: |
-        $VCPKG_ROOT/vcpkg install ffmpeg:x64-windows-static-md
+        $VCPKG_ROOT/vcpkg install
         cargo build --release
 
     - name: rename
