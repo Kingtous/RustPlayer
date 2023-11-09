@@ -60,7 +60,7 @@ jobs:
       shell: bash
       run: |
         pushd /tmp
-        git clone https://github.com/KetaNetwork/cargo-bundle
+        git clone https://github.com/KetaDotCC/cargo-bundle
           pushd cargo-bundle
             cargo install --path .
           popd
