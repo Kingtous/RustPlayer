@@ -20,7 +20,7 @@ env:
   CARGO_TERM_COLOR: always
   VCPKG_COMMIT_ID: 06c79a9afa6f99f02f44d20df9e0848b2a56bf1b
   TAG_NAME: latest
-  VERSION: "1.1.1"
+  VERSION: "1.1.2"
   
 jobs:
   build:
