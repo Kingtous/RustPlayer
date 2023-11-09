@@ -117,17 +117,23 @@ impl FsExplorer {
                 }));
             }
         }
+        dir_entries.sort_by(|item1, item2| {
+            return item1.file_name().cmp(&item2.file_name());
+        });
+        file_entries.sort_by(|item1, item2| {
+            return item1.file_name().cmp(&item2.file_name());
+        });
         Ok((dir_entries, file_entries))
     }
 }
 
 fn draw_dir_item(entry: &DirEntry, vec: &mut Vec<ListItem>) {
-    let file_name = String::from(entry.file_name().to_str().unwrap()) + "/";
+    let file_name = "📂".to_owned() + &String::from(entry.file_name().to_str().unwrap()) + "/";
     vec.push(ListItem::new(file_name));
 }
 
 fn draw_file_item(entry: &DirEntry, vec: &mut Vec<ListItem>) {
-    let file_name = String::from(entry.file_name().to_str().unwrap());
+    let file_name = "🎵".to_owned() + &String::from(entry.file_name().to_str().unwrap());
     vec.push(ListItem::new(file_name));
 }
 
@@ -153,7 +159,7 @@ where
         );
     frame.render_widget(folder, fs_chunks[0]);
     // list
-    let mut items = vec![ListItem::new("Go Back")];
+    let mut items = vec![ListItem::new("🔙Go Back")];
     for entry in &fse.dirs {
         draw_dir_item(entry, &mut items);
     }
