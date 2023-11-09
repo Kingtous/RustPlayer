@@ -53,7 +53,7 @@ jobs:
         
     - name: install ffmpeg deps for macOS
       if: matrix.os == 'macOS-latest'
-      run: brew install ffmpeg@4 pkg-config && brew link ffmpeg@4
+      run: brew install ffmpeg pkg-config && brew link ffmpeg
 
     - name: Install cargo bundle
       if: matrix.os == 'ubuntu-20.04'
@@ -128,7 +128,7 @@ jobs:
     - name: build RustPlayer
       shell: bash
       run: |
-        $VCPKG_ROOT/vcpkg install
+        $VCPKG_ROOT/vcpkg install ffmpeg:x64-windows-static-md
         cargo build --release
 
     - name: rename
