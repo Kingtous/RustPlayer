@@ -1330,6 +1330,7 @@ dependencies = [
  "dirs",
  "failure",
  "ffmpeg-decoder",
+ "lazy_static",
  "m3u8-rs",
  "mp3-duration",
  "open",

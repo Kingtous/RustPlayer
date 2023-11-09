@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Kingtous
+// Copyright (C) 2022 KetaNetwork
 //
 // This file is part of RustPlayer.
 //
@@ -123,23 +123,49 @@ impl App {
             let _ = sd.send(EventType::Radio);
         });
         // start event
-        loop {
-            if event::poll(self.config.refresh_rate)? {
-                if let Event::Key(key) = event::read()? {
-                    match self.mode {
-                        InputMode::Normal => match key.code {
-                            KeyCode::Char('q') | KeyCode::Char('Q') => {
-                                empty_cache();
-                                break;
-                            }
-                            code => {
-                                handle_keyboard_event(self, code);
-                            }
-                        },
+        let (evt_sender, evt_receiver) = mpsc::sync_channel(1);
+        let (exit_sender, exit_receiver) = mpsc::channel();
+        let evt_th = thread::spawn(move || loop {
+            let evt = event::read();
+            match evt {
+                Ok(evt) => {
+                    if let Event::Key(key) = evt {
+                        match self.mode {
+                            InputMode::Normal => match key.code {
+                                KeyCode::Char('q') | KeyCode::Char('Q') => {
+                                    empty_cache();
+                                    drop(evt_sender);
+                                    let _ = exit_sender.send(());
+                                    return;
+                                }
+                                code => {
+                                    match evt_sender.send(code) {
+                                        Ok(_) => {}
+                                        Err(_) => {
+                                            // send error, exit.
+                                            return;
+                                        }
+                                    }
+                                }
+                            },
+                        }
                     }
                 }
+                Err(_) => {
+                    // exit.
+                    return;
+                }
             }
+        });
+        loop {
             thread::sleep(self.config.refresh_rate);
+            if let Ok(_) = exit_receiver.try_recv() {
+                break;
+            }
+            match evt_receiver.try_recv() {
+                Ok(code) => handle_keyboard_event(self, code),
+                _ => {}
+            }
             // 10 fps
             self.draw_frame(&mut terminal)?;
             if let Ok(event) = rd.try_recv() {
@@ -149,6 +175,7 @@ impl App {
         disable_raw_mode()?;
         execute!(terminal.backend_mut(), LeaveAlternateScreen,)?;
         terminal.show_cursor()?;
+        let _ = evt_th.join();
         Ok(())
     }
 

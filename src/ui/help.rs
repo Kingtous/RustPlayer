@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Kingtous
+// Copyright (C) 2022 KetaNetwork
 //
 // This file is part of RustPlayer.
 //
@@ -35,8 +35,8 @@ where
         .direction(Direction::Vertical)
         .constraints([Constraint::Length(3), Constraint::Percentage(100)])
         .split(area);
-    let homepage_text = Paragraph::new("Press <Enter> key to open author(Kingtous)'s home page.")
-        .block(
+    let homepage_text =
+        Paragraph::new("Press <Enter> key to open author(KetaNetwork)'s home page.").block(
             Block::default()
                 .borders(Borders::ALL)
                 .border_type(BorderType::Rounded),

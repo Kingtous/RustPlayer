@@ -1,8 +1,8 @@
 {
   "name": "rustplayer",
-  "version-string": "1.1.1",
+  "version-string": "1.1.2",
   "port-version": 1,
-  "homepage": "https://github.com/kingtous/RustPlayer",
+  "homepage": "https://github.com/KetaNetwork/RustPlayer",
   "description": "Music/Radio Player",
   "dependencies": [
     {

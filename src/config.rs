@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Kingtous
+// Copyright (C) 2022 KetaNetwork
 //
 // This file is part of RustPlayer.
 //
@@ -26,9 +26,9 @@ pub struct Config {
 impl Config {
     pub fn default() -> Self {
         Self {
-            refresh_rate: Duration::from_millis(50),
+            refresh_rate: Duration::from_millis(15),
             tick_gap: Duration::from_millis(100),
-            home_page: "https://github.com/Kingtous",
+            home_page: "https://github.com/KetaNetwork",
         }
     }
 }

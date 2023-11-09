@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Kingtous
+// Copyright (C) 2022 KetaNetwork
 // 
 // This file is part of RustPlayer.
 // 

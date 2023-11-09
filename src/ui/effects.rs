@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Kingtous
+// Copyright (C) 2022 KetaNetwork
 //
 // This file is part of RustPlayer.
 //
@@ -15,7 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
-use std::vec;
+use std::{
+    sync::{Arc, RwLock},
+    vec,
+};
 
 use rand::Rng;
 use tui::{
@@ -27,6 +30,17 @@ use tui::{
 };
 
 use crate::{app::App, media::player::Player};
+use lazy_static::lazy_static;
+
+pub struct WaveEffectCache {
+    cols_data: Vec<(&'static str, u64)>,
+}
+
+lazy_static! {
+    pub static ref LAST_EFFECT_TIME: Arc<RwLock<std::time::Instant>> =
+        Arc::new(RwLock::new(std::time::Instant::now()));
+    pub static ref CACHE_WAVE: Arc<RwLock<Option<WaveEffectCache>>> = Arc::new(RwLock::new(None));
+}
 
 pub fn draw_bar_charts_effect<B>(app: &mut App, frame: &mut Frame<B>, area: Rect)
 where
@@ -34,16 +48,6 @@ where
 {
     let player = &mut app.player;
     let radio = &app.radio;
-
-    let mut rng = rand::thread_rng();
-    let mut cols = vec![];
-    for _ in 0..20 {
-        let mut i = rng.gen_range(0..10);
-        if !player.is_playing() && !radio.is_playing() {
-            i = 0
-        }
-        cols.push(("_", i))
-    }
     match player.has_lyrics() {
         true => {
             let mut lyrics = vec![];
@@ -69,22 +73,56 @@ where
             }
         }
         false => {
-            let items = BarChart::default()
-                .bar_width(4)
-                .bar_gap(1)
-                .bar_style(Style::default().fg(Color::Cyan).bg(Color::Black))
-                .data(&cols)
-                .value_style(Style::default().add_modifier(Modifier::ITALIC))
-                .label_style(Style::default().add_modifier(Modifier::ITALIC))
-                .max(10)
-                .block(
-                    Block::default()
-                        .borders(Borders::ALL)
-                        .border_type(BorderType::Rounded)
-                        .title("Wave")
-                        .title_alignment(Alignment::Center),
-                );
-            frame.render_widget(items, area);
+            let dur = LAST_EFFECT_TIME.read().unwrap().elapsed();
+            let cache_wave = CACHE_WAVE.read().unwrap();
+            if dur.as_millis() <= 300 && cache_wave.is_some() {
+                // reuse draw on every 300ms.
+                let items = BarChart::default()
+                    .bar_width(4)
+                    .bar_gap(1)
+                    .bar_style(Style::default().fg(Color::Cyan).bg(Color::Black))
+                    .data(&cache_wave.as_ref().unwrap().cols_data)
+                    .value_style(Style::default().add_modifier(Modifier::ITALIC))
+                    .label_style(Style::default().add_modifier(Modifier::ITALIC))
+                    .max(10)
+                    .block(
+                        Block::default()
+                            .borders(Borders::ALL)
+                            .border_type(BorderType::Rounded)
+                            .title("Wave")
+                            .title_alignment(Alignment::Center),
+                    );
+                frame.render_widget(items, area);
+            } else {
+                drop(cache_wave);
+                let mut rng = rand::thread_rng();
+                let mut cols = vec![];
+                for _ in 0..20 {
+                    let mut i = rng.gen_range(0..10);
+                    if !player.is_playing() && !radio.is_playing() {
+                        i = 0
+                    }
+                    cols.push(("_", i))
+                }
+                let items = BarChart::default()
+                    .bar_width(4)
+                    .bar_gap(1)
+                    .bar_style(Style::default().fg(Color::Cyan).bg(Color::Black))
+                    .data(&cols)
+                    .value_style(Style::default().add_modifier(Modifier::ITALIC))
+                    .label_style(Style::default().add_modifier(Modifier::ITALIC))
+                    .max(10)
+                    .block(
+                        Block::default()
+                            .borders(Borders::ALL)
+                            .border_type(BorderType::Rounded)
+                            .title("Wave")
+                            .title_alignment(Alignment::Center),
+                    );
+                frame.render_widget(items, area);
+                *LAST_EFFECT_TIME.write().unwrap() = std::time::Instant::now();
+                *CACHE_WAVE.write().unwrap() = Some(WaveEffectCache { cols_data: cols });
+            }
         }
     }
 }

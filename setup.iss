@@ -3,8 +3,8 @@
 
 #define MyAppName "RustPlayer"
 #define MyAppVersion "1.1.0-2"
-#define MyAppPublisher "Kingtous"
-#define MyAppURL "https:/kingtous.cn"
+#define MyAppPublisher "KetaNetwork"
+#define MyAppURL "https:/KetaNetwork.cn"
 #define MyAppExeName "RustPlayer.exe"
 #define MSYS2 "D:\msys64\mingw64"
 

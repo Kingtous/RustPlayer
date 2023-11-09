@@ -1,15 +1,15 @@
-# RustPlayer [![GitHub tag](https://img.shields.io/github/tag/Kingtous/RustPlayer)](https://GitHub.com/Kingtous/RustPlayer/tags/) [![GitHub stars](https://badgen.net/github/stars/Kingtous/RustPlayer)](https://github.com/Kingtous/RustPlayer/stargazers/)
+# RustPlayer [![GitHub tag](https://img.shields.io/github/tag/KetaNetwork/RustPlayer)](https://GitHub.com/KetaNetwork/RustPlayer/tags/) [![GitHub stars](https://badgen.net/github/stars/KetaNetwork/RustPlayer)](https://github.com/KetaNetwork/RustPlayer/stargazers/)
 
-![build status](https://github.com/Kingtous/RustPlayer/actions/workflows/rust.yml/badge.svg)
+![build status](https://github.com/KetaNetwork/RustPlayer/actions/workflows/rust.yml/badge.svg)
 [![rustplayer](https://snapcraft.io/rustplayer/badge.svg)](https://snapcraft.io/rustplayer)
 [![rustplayer](https://snapcraft.io/rustplayer/trending.svg?name=0)](https://snapcraft.io/rustplayer)
 
 [![Linux](https://svgshare.com/i/Zhy.svg)](https://svgshare.com/i/Zhy.svg)
 [![macOS](https://svgshare.com/i/ZjP.svg)](https://svgshare.com/i/ZjP.svg)
 [![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/549d1445d4f14a18b89fbb2340fe15fc)](https://www.codacy.com/gh/Kingtous/RustPlayer/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Kingtous/RustPlayer&amp;utm_campaign=Badge_Grade)
-![commit](https://img.shields.io/github/commit-activity/y/kingtous/RustPlayer)
-[![stars](https://img.shields.io/github/stars/kingtous/RustPlayer?style=social)]()
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/549d1445d4f14a18b89fbb2340fe15fc)](https://www.codacy.com/gh/KetaNetwork/RustPlayer/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=KetaNetwork/RustPlayer&amp;utm_campaign=Badge_Grade)
+![commit](https://img.shields.io/github/commit-activity/y/KetaNetwork/RustPlayer)
+[![stars](https://img.shields.io/github/stars/KetaNetwork/RustPlayer?style=social)]()
 
 An local audio player & network m3u8 radio player using completely terminal gui. MacOS, Linux, Windows are all supported.
 
@@ -30,7 +30,7 @@ RustPlayer is under development. If u have encountered any problem, please open 
 - Playback progress
 - Next audio
 - Adjust volume
-- Developed by Kingtous
+- Developed by KetaNetwork
 
 
 ## Install RustPlayer by Snap Store
@@ -39,7 +39,7 @@ RustPlayer is under development. If u have encountered any problem, please open 
 
 ## Download Binary Release Directly and Run
 
-The binary release of macOS, Ubuntu/Debian Linux, Windows can be found in artifacts of [latest prerelease](https://github.com/Kingtous/RustPlayer/releases/tag/latest). Click the top item of the list to download the latest release.
+The binary release of macOS, Ubuntu/Debian Linux, Windows can be found in artifacts of [latest prerelease](https://github.com/KetaNetwork/RustPlayer/releases/tag/latest). Click the top item of the list to download the latest release.
 
 For Arch/Manjaro users, use `yay -S rustplayer` instead.
 
@@ -68,7 +68,7 @@ The screenshot from Deepin
 If u found this binary release is not working or u like compiling RustPlayer by youselef. Yes, The step to compile RustPlayer is really easy.
 
 - clone this repo.
-  - for arch/manjaro, please use [fix/arch](https://github.com/Kingtous/RustPlayer/tree/fix/arch) branch.
+  - for arch/manjaro, please use [fix/arch](https://github.com/KetaNetwork/RustPlayer/tree/fix/arch) branch.
 - install dependencies
     - check `.github/rust.yml` for details
 - `cargo run` in root of this project.
