@@ -2,6 +2,12 @@ name: Rust
 
 on:
   workflow_dispatch:
+    inputs:
+      RUST_TOOLCHAIN:
+        description: RUST_TOOLCHAIN (stable or 1.73)
+        default: "1.73"
+        required: true
+
   schedule:
     - cron: "0 0 * * *"
   push:
@@ -44,7 +50,7 @@ jobs:
     - name: patch dynamic build
       run: git apply dynamic-lib.patch
 
-    - run: rustup toolchain install stable --profile minimal
+    - run: rustup toolchain install ${{ inputs.RUST_TOOLCHAIN }} --profile minimal
     - uses: Swatinem/rust-cache@v2
 
     - name: install deps for linux
@@ -117,7 +123,7 @@ jobs:
     #     shell: msys2 {0}
     steps:
     - uses: actions/checkout@v2
-    - run: rustup toolchain install stable --profile minimal
+    - run: rustup toolchain install ${{ inputs.RUST_TOOLCHAIN }} --profile minimal
     - uses: Swatinem/rust-cache@v2
 
     - name: setup vcpkg (do not install any package)
