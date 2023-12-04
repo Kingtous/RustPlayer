@@ -94,14 +94,14 @@ impl FsExplorer {
                             for accept_suffix in self.accept_suffix.iter() {
                                 let path = entry.path();
                                 // println!("{:?}", path.display());
-                                if let Some(ext) = path.extension() {
+                                if path.is_dir() {
+                                    dir_entries.push(entry);
+                                    break;
+                                } else if let Some(ext) = path.extension() {
                                     if ext.to_string_lossy().ends_with(accept_suffix) {
                                         file_entries.push(entry);
                                         break;
                                     }
-                                } else if path.is_dir() {
-                                    dir_entries.push(entry);
-                                    break;
                                 }
                             }
                         }
