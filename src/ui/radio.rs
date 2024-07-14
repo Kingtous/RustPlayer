@@ -69,7 +69,7 @@ where
     for radio in &fs.radios {
         item_vec.push(ListItem::new(radio.name.as_str()));
     }
-    let list = List::new(item_vec.as_ref())
+    let list = List::new(item_vec)
         .block(
             Block::default()
                 .borders(Borders::all())
