@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       RUST_TOOLCHAIN:
-        description: RUST_TOOLCHAIN (stable or 1.73)
-        default: "1.73"
+        description: RUST_TOOLCHAIN (stable or 1.89)
+        default: "1.89"
         required: true
 
   schedule:
@@ -53,20 +53,12 @@ jobs:
     - run: rustup toolchain install ${{ inputs.RUST_TOOLCHAIN }} --profile minimal
     - uses: Swatinem/rust-cache@v2
 
-    - name: install deps for linux
-      if: matrix.os == 'ubuntu-20.04'
-      run: sudo apt update && sudo apt install -y libasound2-dev libavcodec-dev libavformat-dev libswresample-dev libavutil-dev libavformat-dev pkg-config
-        
-    - name: install ffmpeg deps for macOS
-      if: matrix.os == 'macOS-latest'
-      run: brew install ffmpeg pkg-config && brew link ffmpeg
-
     - name: Install cargo bundle
       if: matrix.os == 'ubuntu-20.04'
       shell: bash
       run: |
         pushd /tmp
-        git clone https://github.com/KetaDotCC/cargo-bundle
+        git clone https://github.com/burtonageo/cargo-bundle
           pushd cargo-bundle
             cargo install --path .
           popd
