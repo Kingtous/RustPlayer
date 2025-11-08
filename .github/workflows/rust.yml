@@ -26,7 +26,7 @@ env:
   CARGO_TERM_COLOR: always
   VCPKG_COMMIT_ID: 06c79a9afa6f99f02f44d20df9e0848b2a56bf1b
   TAG_NAME: latest
-  VERSION: "1.1.2"
+  VERSION: "1.1.4"
   
 jobs:
   build:
@@ -35,10 +35,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, macOS-latest] 
+        os: [ubuntu-22.04, macOS-latest] 
         include:
           - name: linux
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             artifact_name: target/release/RustPlayer
             asset_name: RustPlayer-linux-amd64
           - name: macos
@@ -47,14 +47,14 @@ jobs:
             asset_name: RustPlayer-macos
     steps:
     - uses: actions/checkout@v2
-    - name: patch dynamic build
-      run: git apply dynamic-lib.patch
+    # - name: patch dynamic build
+    #   run: git apply dynamic-lib.patch
 
     - run: rustup toolchain install ${{ inputs.RUST_TOOLCHAIN }} --profile minimal
     - uses: Swatinem/rust-cache@v2
 
     - name: Install cargo bundle
-      if: matrix.os == 'ubuntu-20.04'
+      if: matrix.os == 'ubuntu-22.04'
       shell: bash
       run: |
         pushd /tmp
@@ -69,7 +69,7 @@ jobs:
       run: cargo build --release
 
     - name: build RustPlayer for Linux
-      if: matrix.os == 'ubuntu-20.04'
+      if: matrix.os == 'ubuntu-22.04'
       run: cargo bundle --release
 
     - name: bundle RustPlayer for macOS
@@ -82,7 +82,7 @@ jobs:
         mv target/release/rustplayer rustplayer-binary-macos
 
     - name: Publish Release for linux
-      if: matrix.os == 'ubuntu-20.04'
+      if: matrix.os == 'ubuntu-22.04'
       uses: softprops/action-gh-release@v1
       with:
         prerelease: true
@@ -126,7 +126,7 @@ jobs:
     - name: build RustPlayer
       shell: bash
       run: |
-        $VCPKG_ROOT/vcpkg install ffmpeg:x64-windows-static-md
+        # $VCPKG_ROOT/vcpkg install ffmpeg:x64-windows-static-md
         cargo build --release
 
     - name: rename
