@@ -26,6 +26,10 @@ parts:
       - libssl-dev
       - clang
       - git
+      - nasm
+      - yasm
+      - libclang-dev
+      - libasound2-dev
     stage-packages:
       - libasound2
 
