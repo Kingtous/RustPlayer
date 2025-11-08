@@ -31,7 +31,7 @@ use std::{
 use m3u8_rs::{MediaPlaylist, Playlist};
 
 use rodio::cpal;
-use rodio::{Decoder, OutputStream, OutputStreamHandle, Sink, Source};
+use rodio::{Decoder, OutputStream, OutputStreamBuilder, Sink, Source};
 use tui::widgets::ListState;
 
 use crate::util::lyrics::Lyrics;
@@ -114,7 +114,6 @@ pub struct MusicPlayer {
     // media: Media,
     // stream
     stream: OutputStream,
-    stream_handle: OutputStreamHandle,
     sink: Sink,
     current_lyric: Option<String>,
     initialized: bool,
@@ -125,15 +124,15 @@ impl Player for MusicPlayer {
         for dev in cpal::available_hosts() {
             println!("{:?}", dev);
         }
-        let (stream, stream_handle) = OutputStream::try_default().unwrap();
-        let sink = Sink::try_new(&stream_handle).unwrap();
+        let builder = OutputStreamBuilder::from_default_device().unwrap();
+        let stream = builder.open_stream_or_fallback().unwrap();
+        let sink = Sink::connect_new(stream.mixer());
         Self {
             current_time: Duration::from_secs(0),
             total_time: Duration::from_secs(0),
             play_list: PlayList { lists: vec![] },
             // media: f,
             stream,
-            stream_handle,
             sink,
             current_lyric: None,
             initialized: false,
@@ -181,14 +180,12 @@ impl Player for MusicPlayer {
                 let top_music = self.play_list.lists.first().unwrap();
                 let f = File::open(top_music.path.as_str()).unwrap();
                 let buf_reader = BufReader::new(f);
-                let (stream, stream_handle) = OutputStream::try_default().unwrap();
-                self.stream = stream;
-                self.stream_handle = stream_handle;
-                let volume = self.volume();
-                self.sink = Sink::try_new(&self.stream_handle).unwrap();
-                self.set_volume(volume);
-                self.sink.append(Decoder::new(buf_reader).unwrap());
-                self.play();
+                if let Ok(data_decoder) = Decoder::new(buf_reader) {
+                    self.sink.append(data_decoder);
+                    self.play();
+                } else {
+                    return false;
+                }
             }
             // for
         } else {
@@ -355,8 +352,11 @@ impl MusicPlayer {
                     // rebuild
                     self.stop();
                     let buf_reader = BufReader::new(f);
-                    let sink = self.stream_handle.play_once(buf_reader).unwrap();
-                    self.sink = sink;
+                    if let Ok(data_decoder) = Decoder::new(buf_reader) {
+                        self.sink.append(data_decoder);
+                    } else {
+                        return false;
+                    }
                     self.play_list.lists.clear();
                 }
                 let mut state = ListState::default();
@@ -398,7 +398,6 @@ pub struct RadioPlayer {
     pub item: Option<RadioItem>,
     pub list: Vec<PlayListItem>,
     stream: OutputStream,
-    stream_handle: OutputStreamHandle,
     sink: Sink,
     is_playing: bool,
     last_playing_id: i32,
@@ -410,15 +409,15 @@ pub struct RadioPlayer {
 
 impl Player for RadioPlayer {
     fn new() -> Self {
-        let (stream, handle) = OutputStream::try_default().unwrap();
-        let sink = Sink::try_new(&handle).unwrap();
+        let builder = OutputStreamBuilder::from_default_device().unwrap();
+        let stream = builder.open_stream_or_fallback().unwrap();
+        let sink = Sink::connect_new(stream.mixer());
         let (tx, rx) = channel();
         empty_cache();
         RadioPlayer {
             item: None,
             list: vec![],
             stream,
-            stream_handle: handle,
             sink,
             is_playing: false,
             last_playing_id: -1,

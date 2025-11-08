@@ -2,13 +2,13 @@ use crate::error::Error;
 
 use ffmpeg_sys_next::{
     self, av_frame_alloc, av_frame_free, av_frame_unref, av_freep, av_get_alt_sample_fmt,
-    av_get_bytes_per_sample, av_get_channel_layout_nb_channels, av_get_sample_fmt_name,
+    av_get_bytes_per_sample, av_get_sample_fmt_name,
     av_init_packet, av_packet_unref, av_read_frame, av_sample_fmt_is_planar,
     av_samples_alloc, av_samples_get_buffer_size, avcodec_alloc_context3, avcodec_close,
     avcodec_find_decoder, avcodec_free_context, avcodec_open2, avcodec_parameters_to_context,
     avcodec_receive_frame, avcodec_send_packet, avformat_close_input, avformat_find_stream_info,
-    avformat_open_input, swr_alloc_set_opts, swr_convert, swr_get_out_samples, swr_init, AVCodec,
-    AVCodecContext, AVFormatContext, AVFrame, AVMediaType, AVPacket, AVSampleFormat, AVStream,
+    avformat_open_input, swr_alloc_set_opts2, swr_convert, swr_get_out_samples, swr_init, AVCodec,
+    AVCodecContext, AVFormatContext, AVFrame, AVMediaType, AVPacket, AVSampleFormat, AVStream, AVChannelLayout
 };
 use std::ffi::{CStr, CString};
 use std::path::Path;
@@ -117,7 +117,7 @@ impl Decoder {
     fn convert_and_store_frame(&mut self) {
         let num_samples = self.frame.num_samples();
         let channel_layout = self.frame.channel_layout();
-        let num_channels = unsafe { av_get_channel_layout_nb_channels(channel_layout) };
+        let num_channels = channel_layout.nb_channels;
 
         let extended_data = self.frame.extended_data();
 
@@ -190,10 +190,10 @@ impl Decoder {
         unsafe { av_packet_unref(self.packet.inner.as_mut_ptr()) };
     }
 
-    fn next_sample(&mut self) -> i16 {
+    fn next_sample(&mut self) -> f32 {
         let sample_u8: [u8; 2] = [self.current_frame.remove(0), self.current_frame.remove(0)];
 
-        ((sample_u8[1] as i16) << 8) | sample_u8[0] as i16
+        (((sample_u8[1] as i16) << 8) | sample_u8[0] as i16) as _
     }
 
     fn process_next_frame(&mut self) -> Option<Result<(), Error>> {
@@ -277,7 +277,7 @@ impl Decoder {
 unsafe impl Send for Decoder {}
 
 impl Iterator for Decoder {
-    type Item = i16;
+    type Item = f32;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
@@ -371,26 +371,29 @@ struct SwrContext {
 
 impl SwrContext {
     fn new(codec_ctx: &CodecContext) -> Result<SwrContext, Error> {
-        let swr_ctx: *mut ffmpeg_sys_next::SwrContext = unsafe {
-            swr_alloc_set_opts(
-                ptr::null_mut(),
-                codec_ctx.channel_layout() as i64,
+        unsafe  {
+            let mut swr_ctx: *mut ffmpeg_sys_next::SwrContext = std::ptr::null_mut();
+
+            let channel_layout = codec_ctx.channel_layout();
+
+            let ret = swr_alloc_set_opts2(
+                &mut swr_ctx,
+                &channel_layout as *const AVChannelLayout,
                 DEFAULT_CONVERSION_FORMAT,
                 codec_ctx.sample_rate(),
-                codec_ctx.channel_layout() as i64,
+                &channel_layout as *const AVChannelLayout,
                 codec_ctx.sample_format(),
                 codec_ctx.sample_rate(),
                 0,
                 ptr::null_mut(),
-            )
-        };
+            );
+            
+            if ret != 0 || swr_ctx.is_null() {
+                return Err(Error::InitializeSwr);
+            }
 
-        let status = unsafe { swr_init(swr_ctx) };
-        if status != 0 {
-            return Err(Error::InitializeSwr);
+            Ok(SwrContext { inner: swr_ctx })
         }
-
-        Ok(SwrContext { inner: swr_ctx })
     }
 }
 
@@ -427,8 +430,8 @@ impl Frame {
         unsafe { self.inner.as_ref().unwrap().nb_samples }
     }
 
-    fn channel_layout(&self) -> u64 {
-        unsafe { self.inner.as_ref().unwrap().channel_layout }
+    fn channel_layout(&self) -> AVChannelLayout {
+        unsafe { self.inner.as_ref().unwrap().ch_layout }
     }
 
     fn extended_data(&self) -> *mut *const u8 {
@@ -531,11 +534,11 @@ impl CodecContext {
     }
 
     fn channels(&self) -> i32 {
-        unsafe { self.inner.as_ref().unwrap().channels }
+        unsafe { self.inner.as_ref().unwrap().ch_layout.nb_channels }
     }
 
-    fn channel_layout(&self) -> u64 {
-        unsafe { self.inner.as_ref().unwrap().channel_layout }
+    fn channel_layout(&self) -> AVChannelLayout {
+        unsafe { self.inner.as_ref().unwrap().ch_layout }
     }
 
     fn is_planar(&self) -> i32 {
