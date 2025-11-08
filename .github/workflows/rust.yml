@@ -121,7 +121,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { sys: mingw64, env: x86_64, artifact_name: target/release/RustPlayer.exe , asset_name: RustPlayer-windows-x86_64.exe }
+          - { sys: msvc, env: x86_64, artifact_name: target/release/RustPlayer.exe , asset_name: RustPlayer-windows-x86_64.exe }
           # - { sys: mingw32, env: i686, artifact_name: target/release/RustPlayer.exe , asset_name: RustPlayer-windows-x86.exe }
           # - { sys: ucrt64,  env: ucrt-x86_64 }  # Experimental!
           # - { sys: clang64, env: clang-x86_64 } # Experimental!
@@ -150,7 +150,7 @@ jobs:
     - name: rename
       shell: bash
       run: |
-        mv target/release/rustplayer.exe target/release/rustplayer-${{ env.VERSION }}.exe
+        mv target/release/rustplayer.exe target/release/rustplayer-${{ matrix.sys }}-${{ matrix.env }}-${{ env.VERSION }}.exe
 
     - name: Publish Release
       uses: softprops/action-gh-release@v1
