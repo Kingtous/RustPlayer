@@ -24,7 +24,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  VCPKG_COMMIT_ID: 06c79a9afa6f99f02f44d20df9e0848b2a56bf1b
+  VCPKG_COMMIT_ID: 365f6444ab40ee87c73c947b475b3a267b3cb77c
   TAG_NAME: latest
   VERSION: "1.1.4"
   
@@ -136,14 +136,15 @@ jobs:
     - run: rustup toolchain install ${{ inputs.RUST_TOOLCHAIN }} --profile minimal
     - uses: Swatinem/rust-cache@v2
 
-    # - name: setup vcpkg (do not install any package)
-    #   uses: lukka/run-vcpkg@v10
-    #   with:
-    #     vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
+    - name: setup vcpkg (do not install any package)
+      uses: lukka/run-vcpkg@v10
+      with:
+        vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
 
     - name: build RustPlayer
+      shell: bash
       run: |
-        # $VCPKG_ROOT/vcpkg install ffmpeg:x64-windows-static-md
+        $VCPKG_ROOT/vcpkg install ffmpeg:x64-windows-static-md
         cargo build --release
 
     - name: rename
