@@ -20,7 +20,7 @@ parts:
     source: .
     override-pull: |
       snapcraftctl pull
-      git apply dynamic-lib.patch
+      git submodule update --init --recursive
     build-packages:
       - pkg-config
       - libssl-dev

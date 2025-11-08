@@ -9,11 +9,11 @@ on:
         required: true
 
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "0 0 1 * *"
   push:
     paths-ignore: 
       - 'README.md'
-      - '.github/**'
+      # - '.github/**'
     branches: [ master ]
     
   pull_request:
@@ -47,6 +47,8 @@ jobs:
             asset_name: RustPlayer-macos
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     # - name: patch dynamic build
     #   run: git apply dynamic-lib.patch
 
@@ -115,6 +117,8 @@ jobs:
     #     shell: msys2 {0}
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - run: rustup toolchain install ${{ inputs.RUST_TOOLCHAIN }} --profile minimal
     - uses: Swatinem/rust-cache@v2
 

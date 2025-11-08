@@ -1,0 +1,3 @@
+[submodule "thirdparty/rust-ffmpeg-sys"]
+	path = thirdparty/rust-ffmpeg-sys
+	url = https://github.com/Kingtous/rust-ffmpeg-sys.git
