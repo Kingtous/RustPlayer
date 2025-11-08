@@ -141,15 +141,7 @@ jobs:
     #   with:
     #     vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
 
-    - name: Verify toolchain
-      run: |
-        where cl
-        where link
-        cl /?
-        link /?
-
     - name: build RustPlayer
-      shell: bash
       run: |
         # $VCPKG_ROOT/vcpkg install ffmpeg:x64-windows-static-md
         cargo build --release
