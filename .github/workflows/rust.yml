@@ -94,7 +94,7 @@ jobs:
         # for name in target/release/bundle/osx/*.app; do
         #   create-dmg $name || true
         # done
-        mv target/release/rustplayer ${{ matrix.asset_name }}
+        mv target/release/rustplayer ${{ matrix.asset_name }}-${{ env.VERSION }}.out
 
     - name: Publish Release for linux
       if: matrix.name == 'ubuntu'
@@ -112,7 +112,7 @@ jobs:
         prerelease: true
         tag_name: ${{ env.TAG_NAME }}
         files: |
-          ${{ matrix.asset_name }}
+          ${{ matrix.asset_name }}-${{ env.VERSION }}.out
 
   build-on-windows:
     runs-on: windows-latest
