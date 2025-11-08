@@ -59,12 +59,18 @@ jobs:
     - run: rustup toolchain install ${{ inputs.RUST_TOOLCHAIN }} --profile minimal
     - uses: Swatinem/rust-cache@v2
 
+    - name: Install macos deps
+      if: matrix.name == 'macos'
+      run: |
+        brew update
+        brew install nasm yasm
+
     - name: Install cargo bundle and deps
       if: matrix.name == 'ubuntu'
       shell: bash
       run: |
         sudo apt update -y
-        sudo apt-get install -y pkg-config libasound2-dev libssl-dev libclang-dev
+        sudo apt-get install -y pkg-config libasound2-dev libssl-dev libclang-dev nasm yasm
         
         pushd /tmp
         git clone https://github.com/burtonageo/cargo-bundle
@@ -130,10 +136,17 @@ jobs:
     - run: rustup toolchain install ${{ inputs.RUST_TOOLCHAIN }} --profile minimal
     - uses: Swatinem/rust-cache@v2
 
-    - name: setup vcpkg (do not install any package)
-      uses: lukka/run-vcpkg@v10
-      with:
-        vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
+    # - name: setup vcpkg (do not install any package)
+    #   uses: lukka/run-vcpkg@v10
+    #   with:
+    #     vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
+
+    - name: Verify toolchain
+      run: |
+        where cl
+        where link
+        cl /?
+        link /?
 
     - name: build RustPlayer
       shell: bash
