@@ -139,11 +139,13 @@ impl App {
                                     return;
                                 }
                                 code => {
-                                    match evt_sender.send(code) {
-                                        Ok(_) => {}
-                                        Err(_) => {
-                                            // send error, exit.
-                                            return;
+                                    if key.is_press() {
+                                        match evt_sender.send(code) {
+                                            Ok(_) => {}
+                                            Err(_) => {
+                                                // send error, exit.
+                                                return;
+                                            }
                                         }
                                     }
                                 }
