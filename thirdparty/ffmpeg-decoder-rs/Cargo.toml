@@ -27,7 +27,7 @@ features = ["avcodec", "avformat", "swresample", "static", "build"]
 [target.'cfg(windows)'.dependencies.ffmpeg-sys-next]
 path = "../rust-ffmpeg-sys"
 default-features = false
-features = ["avcodec", "avformat", "swresample"]
+features = ["avcodec", "avformat", "swresample", "static"]
 
 
 [dependencies]
