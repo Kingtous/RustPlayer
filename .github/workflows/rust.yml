@@ -115,7 +115,7 @@ jobs:
           ${{ matrix.asset_name }}-${{ env.VERSION }}.out
 
   build-on-windows:
-    runs-on: windows-latest
+    runs-on: windows-2022
     continue-on-error: true
     strategy:
       fail-fast: false
@@ -137,14 +137,13 @@ jobs:
     - uses: Swatinem/rust-cache@v2
 
     - name: setup vcpkg (do not install any package)
-      uses: lukka/run-vcpkg@v10
+      uses: lukka/run-vcpkg@v11
       with:
         vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
 
     - name: build RustPlayer
-      shell: bash
       run: |
-        $VCPKG_ROOT/vcpkg install ffmpeg:x64-windows-static-md
+        vcpkg install ffmpeg:x64-windows-static-md
         cargo build --release
 
     - name: rename
