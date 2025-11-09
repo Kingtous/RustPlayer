@@ -19,7 +19,7 @@ path = "src/lib.rs"
 default = []
 rodio_source = ['rodio']
 
-[dependencies.ffmpeg-sys-next]
+[target.'cfg(not(windows))'.dependencies.ffmpeg-sys-next]
 path = "../rust-ffmpeg-sys"
 default-features = false
 features = ["avcodec", "avformat", "swresample", "static", "build"]
