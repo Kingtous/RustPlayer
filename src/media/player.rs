@@ -177,15 +177,18 @@ impl Player for MusicPlayer {
             self.stop();
             if !self.play_list.lists.is_empty() {
                 // next song
-                let top_music = self.play_list.lists.first().unwrap();
-                let f = File::open(top_music.path.as_str()).unwrap();
-                let buf_reader = BufReader::new(f);
-                if let Ok(data_decoder) = Decoder::new(buf_reader) {
-                    self.sink.append(data_decoder);
-                    self.play();
-                } else {
-                    return false;
+                if let Some(top_music) = self.play_list.lists.first() {
+                    if let Ok(f) = File::open(top_music.path.as_str()) {
+                        let buf_reader = BufReader::new(f);
+                        if let Ok(data_decoder) = Decoder::new(buf_reader) {
+                            self.sink.append(data_decoder);
+                            self.play();
+                        } else {
+                            return false;
+                        }
+                    }
                 }
+                return false;
             }
             // for
         } else {
