@@ -21,7 +21,6 @@ use std::sync::mpsc::{Receiver, Sender};
 use std::{
     fs::File,
     io::{BufReader, Write},
-    ops::Add,
     path::Path,
     sync::mpsc::channel,
     thread,
@@ -32,7 +31,7 @@ use m3u8_rs::{MediaPlaylist, Playlist};
 
 use rodio::cpal;
 use rodio::{Decoder, OutputStream, OutputStreamBuilder, Sink, Source};
-use tui::widgets::ListState;
+use ratatui::widgets::ListState;
 
 use crate::util::lyrics::Lyrics;
 use crate::util::m3u8::empty_cache;
@@ -43,9 +42,12 @@ use super::media::Media;
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
 pub enum PlayStatus {
     Waiting,
-    Playing(Instant, Duration),
-    // elapsed, times already played
-    Stopped(Duration), // times already played
+    /// Currently playing. The `Instant` records when playback started/resumed;
+    /// the actual decoded position is read from `Sink::get_pos()`, not derived
+    /// from this instant.
+    Playing(Instant),
+    /// Paused. Holds the last position reported by `Sink::get_pos()`.
+    Stopped(Duration),
 }
 
 pub struct PlayListItem {
@@ -158,13 +160,10 @@ impl Player for MusicPlayer {
         if let Some(item) = self.play_list.lists.first_mut() {
             let status = &mut item.status;
             match status {
-                PlayStatus::Waiting => {
-                    *status = PlayStatus::Playing(Instant::now(), Duration::from_nanos(0));
+                PlayStatus::Waiting | PlayStatus::Stopped(_) => {
+                    *status = PlayStatus::Playing(Instant::now());
                 }
-                PlayStatus::Playing(_, _) => {}
-                PlayStatus::Stopped(duration) => {
-                    *status = PlayStatus::Playing(Instant::now(), *duration);
-                }
+                PlayStatus::Playing(_) => {}
             }
         }
         true
@@ -206,14 +205,10 @@ impl Player for MusicPlayer {
     fn pause(&mut self) -> bool {
         self.sink.pause();
         if let Some(item) = self.play_list.lists.first_mut() {
-            let status = &mut item.status;
-            match status {
-                PlayStatus::Waiting => {}
-                PlayStatus::Playing(instant, duration) => {
-                    *status = PlayStatus::Stopped(duration.add(instant.elapsed()));
-                }
-                PlayStatus::Stopped(_) => {}
-            }
+            // Pull the position from the audio device so it matches the
+            // already-decoded samples, not wall clock.
+            item.current_pos = self.sink.get_pos();
+            item.status = PlayStatus::Stopped(item.current_pos);
         }
         true
     }
@@ -224,9 +219,9 @@ impl Player for MusicPlayer {
             let status = &mut item.status;
             match status {
                 PlayStatus::Waiting => {}
-                PlayStatus::Playing(_, _) => {}
-                PlayStatus::Stopped(duration) => {
-                    *status = PlayStatus::Playing(Instant::now(), *duration);
+                PlayStatus::Playing(_) => {}
+                PlayStatus::Stopped(_) => {
+                    *status = PlayStatus::Playing(Instant::now());
                 }
             }
         }
@@ -244,24 +239,34 @@ impl Player for MusicPlayer {
     fn tick(&mut self) {
         let is_playing = self.is_playing();
         if let Some(song) = self.play_list.lists.first_mut() {
+            // Source of truth for playback position: rodio's sink, which
+            // counts the samples ffmpeg has already decoded. When paused the
+            // sink stops advancing, so the last value we wrote into
+            // `current_pos` is what we should display.
+            let now = if is_playing {
+                self.sink.get_pos()
+            } else {
+                song.current_pos
+            };
+            song.current_pos = now;
+            self.current_time = now;
+            self.total_time = song.duration.clone();
+
+            if is_playing && now >= song.duration {
+                self.next();
+                return;
+            }
+
             let status = &mut song.status;
             match status {
                 PlayStatus::Waiting => {
                     if is_playing {
-                        *status = PlayStatus::Playing(Instant::now(), Duration::from_nanos(0));
+                        *status = PlayStatus::Playing(Instant::now());
                     }
                 }
-                PlayStatus::Playing(instant, duration) => {
-                    let now = instant.elapsed().add(duration.clone());
-                    if now.ge(&song.duration) {
-                        // next song, delete 0
-                        self.next();
-                    } else {
-                        // update status
-                        self.current_time = now;
-                        self.total_time = song.duration.clone();
-                        // add lyrics
-                        let selected_index = song.lyrics_index.selected().unwrap();
+                PlayStatus::Playing(_) => {
+                    // advance lyrics highlight
+                    if let Some(selected_index) = song.lyrics_index.selected() {
                         if selected_index + 1 < song.lyrics.list.len() {
                             let next_lyric = &song.lyrics.list[selected_index + 1];
                             if self.current_time > next_lyric.time {
@@ -270,10 +275,7 @@ impl Player for MusicPlayer {
                         }
                     }
                 }
-                PlayStatus::Stopped(dur) => {
-                    self.current_time = dur.clone();
-                    self.total_time = song.duration.clone();
-                }
+                PlayStatus::Stopped(_) => {}
             }
         } else {
             // stop player when no sounds

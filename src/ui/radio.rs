@@ -5,7 +5,7 @@ use std::{
 };
 
 use dirs;
-use tui::{
+use ratatui::{
     backend::Backend,
     layout::{Alignment, Rect},
     style::{Color, Style},

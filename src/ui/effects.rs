@@ -21,7 +21,7 @@ use std::{
 };
 
 use rand::Rng;
-use tui::{
+use ratatui::{
     backend::Backend,
     layout::{Alignment, Rect},
     style::{Color, Modifier, Style},

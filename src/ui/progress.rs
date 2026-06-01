@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
-use tui::{
+use ratatui::{
     backend::Backend,
     layout::{Constraint, Layout, Rect},
     style::{Color, Modifier, Style},

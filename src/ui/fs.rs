@@ -16,18 +16,17 @@
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::env::current_dir;
-use std::fmt::Debug;
 use std::fs;
 use std::fs::DirEntry;
 use std::path::Path;
 
-use failure::{Error, Fail};
-use tui::backend::Backend;
-use tui::layout::{Alignment, Constraint, Direction, Layout, Rect};
-use tui::style::{Color, Style};
-use tui::text::Text;
-use tui::widgets::{Block, BorderType, Borders, List, ListItem, ListState, Paragraph, Wrap};
-use tui::Frame;
+use anyhow::{Error, anyhow};
+use ratatui::backend::Backend;
+use ratatui::layout::{Alignment, Constraint, Direction, Layout, Rect};
+use ratatui::style::{Color, Style};
+use ratatui::text::Text;
+use ratatui::widgets::{Block, BorderType, Borders, List, ListItem, ListState, Paragraph, Wrap};
+use ratatui::Frame;
 
 use crate::app::ActiveModules;
 use crate::App;
@@ -42,18 +41,12 @@ pub struct FsExplorer {
     accept_suffix: Vec<&'static str>,
 }
 
-#[derive(Fail, Debug)]
-#[fail(display = "FsError: {}", msg)]
-pub struct FsError {
-    msg: &'static str,
-}
-
 impl FsExplorer {
     pub fn default(callback: Option<fn(Error)>) -> Result<Self, Error> {
         let path = current_dir()?;
-        let path_str = path.to_str().ok_or(FsError {
-            msg: "path to_str error.",
-        })?;
+        let path_str = path
+            .to_str()
+            .ok_or_else(|| anyhow!("path to_str error."))?;
         let mut list_state = ListState::default();
         list_state.select(Some(0));
         let mut exp = Self {
@@ -112,9 +105,7 @@ impl FsExplorer {
                 }
             }
             false => {
-                return Err(Error::from(FsError {
-                    msg: "is not a valid path",
-                }));
+                return Err(anyhow!("is not a valid path"));
             }
         }
         dir_entries.sort_by(|item1, item2| {

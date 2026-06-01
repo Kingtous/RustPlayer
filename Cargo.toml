@@ -10,13 +10,13 @@ authors = ["Kingtous"]
 [dependencies]
 rand = "0.8.5"
 
-tui = "0.19.0"
+ratatui = "0.29"
 crossterm = "0.29.0"
 
 rodio = { version = "0.21", features = ["mp3", "wav", "flac"] }
 mp3-duration = "0.1.10"
 
-failure = "0.1.8"
+anyhow = "1.0"
 
 open = "2.1.0"
 
