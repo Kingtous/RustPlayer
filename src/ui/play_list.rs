@@ -16,7 +16,6 @@
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
 use ratatui::{
-    backend::Backend,
     layout::{Alignment, Rect},
     widgets::{Block, BorderType, Borders, List, ListItem},
     Frame,
@@ -24,9 +23,7 @@ use ratatui::{
 
 use crate::app::App;
 
-pub fn draw_play_list<B>(app: &mut App, frame: &mut Frame<B>, area: Rect)
-where
-    B: Backend,
+pub fn draw_play_list(app: &mut App, frame: &mut Frame, area: Rect)
 {
     let mut items = vec![];
     let player = &app.player;

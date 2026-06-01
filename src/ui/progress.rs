@@ -16,7 +16,6 @@
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
 use ratatui::{
-    backend::Backend,
     layout::{Constraint, Layout, Rect},
     style::{Color, Modifier, Style},
     symbols::{self},
@@ -26,9 +25,7 @@ use ratatui::{
 
 use crate::{app::App, media::player::Player};
 
-pub fn draw_progress<B>(app: &mut App, frame: &mut Frame<B>, area: Rect)
-where
-    B: Backend,
+pub fn draw_progress(app: &mut App, frame: &mut Frame, area: Rect)
 {
     let player = &app.player;
 

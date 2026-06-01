@@ -21,7 +21,6 @@ use std::fs::DirEntry;
 use std::path::Path;
 
 use anyhow::{Error, anyhow};
-use ratatui::backend::Backend;
 use ratatui::layout::{Alignment, Constraint, Direction, Layout, Rect};
 use ratatui::style::{Color, Style};
 use ratatui::text::Text;
@@ -128,9 +127,7 @@ fn draw_file_item(entry: &DirEntry, vec: &mut Vec<ListItem>) {
     vec.push(ListItem::new(file_name));
 }
 
-pub fn draw_fs_tree<B>(app: &mut App, frame: &mut Frame<B>, area: Rect)
-where
-    B: Backend,
+pub fn draw_fs_tree(app: &mut App, frame: &mut Frame, area: Rect)
 {
     let fse = &mut app.fs;
     let fs_chunks = Layout::default()

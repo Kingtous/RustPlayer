@@ -224,10 +224,8 @@ impl App {
         Ok(())
     }
 
-    pub fn draw_header<B>(&mut self, frame: &mut Frame<B>, area: Rect)
-    where
-        B: Backend,
-    {
+    pub fn draw_header(&mut self, frame: &mut Frame, area: Rect)
+{
         let block = Block::default()
             .title("RustPlayer - Music Player For Rust")
             .borders(Borders::ALL)
@@ -243,10 +241,8 @@ impl App {
         frame.render_widget(msg_p, area);
     }
 
-    pub fn draw_body<B>(&mut self, frame: &mut Frame<B>, area: Rect) -> Result<(), Error>
-    where
-        B: Backend,
-    {
+    pub fn draw_body(&mut self, frame: &mut Frame, area: Rect) -> Result<(), Error>
+{
         let route = self.route_stack.first().unwrap();
         match route {
             Routes::Main => {

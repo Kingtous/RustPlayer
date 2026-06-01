@@ -18,7 +18,6 @@
 use std::vec;
 
 use ratatui::{
-    backend::Backend,
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Style},
     widgets::{Block, BorderType, Borders, Paragraph, Row, Table},
@@ -27,9 +26,7 @@ use ratatui::{
 
 use crate::app::App;
 
-pub fn draw_help<B>(_app: &mut App, frame: &mut Frame<B>, area: Rect)
-where
-    B: Backend,
+pub fn draw_help(_app: &mut App, frame: &mut Frame, area: Rect)
 {
     let chunks = Layout::default()
         .direction(Direction::Vertical)
@@ -43,24 +40,27 @@ where
         );
     frame.render_widget(homepage_text, chunks[0]);
 
-    let help_table = Table::new([
-        Row::new(["h", "open or close this help."]),
-        Row::new([
-            "Tab",
-            "switch highlight block. (Audio Explorer/Radio Explorer)",
-        ]),
-        Row::new(["r", "open radio config list."]),
-        Row::new(["->", "add audio to play list."]),
-        Row::new([
-            "Enter",
-            "play audio immediately and clean play list or enter selected folder.",
-        ]),
-        Row::new(["-/+", "decrease/increase volume."]),
-        Row::new(["s", "pause/resume audio playback."]),
-        Row::new(["n", "play the next audio."]),
-        Row::new(["q", "quit RustPlayer."]),
-        Row::new(["↑/↓", "change selected index."]),
-    ])
+    let help_table = Table::new(
+        [
+            Row::new(["h", "open or close this help."]),
+            Row::new([
+                "Tab",
+                "switch highlight block. (Audio Explorer/Radio Explorer)",
+            ]),
+            Row::new(["r", "open radio config list."]),
+            Row::new(["->", "add audio to play list."]),
+            Row::new([
+                "Enter",
+                "play audio immediately and clean play list or enter selected folder.",
+            ]),
+            Row::new(["-/+", "decrease/increase volume."]),
+            Row::new(["s", "pause/resume audio playback."]),
+            Row::new(["n", "play the next audio."]),
+            Row::new(["q", "quit RustPlayer."]),
+            Row::new(["↑/↓", "change selected index."]),
+        ],
+        [Constraint::Min(6), Constraint::Percentage(100)],
+    )
     .header(
         Row::new(vec!["Key", "Function"])
             .style(Style::default().fg(Color::White))
@@ -72,7 +72,6 @@ where
             .border_type(BorderType::Rounded)
             .borders(Borders::ALL),
     )
-    .column_spacing(2)
-    .widths(&[Constraint::Min(6), Constraint::Percentage(100)]);
+    .column_spacing(2);
     frame.render_widget(help_table, chunks[1]);
 }

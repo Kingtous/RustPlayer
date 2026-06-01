@@ -16,11 +16,10 @@
 // along with RustPlayer.  If not, see <http://www.gnu.org/licenses/>.
 
 use ratatui::{
-    backend::Backend,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     symbols::{self},
-    text::Spans,
+    text::Line,
     widgets::{Block, BorderType, Borders, LineGauge, ListState, Paragraph},
     Frame,
 };
@@ -33,9 +32,7 @@ pub struct MusicController {
     pub state: ListState,
 }
 
-pub fn draw_music_board<B>(app: &mut App, frame: &mut Frame<B>, area: Rect)
-where
-    B: Backend,
+pub fn draw_music_board(app: &mut App, frame: &mut Frame, area: Rect)
 {
     let main_layout_chunks = Layout::default()
         .direction(Direction::Vertical)
@@ -58,9 +55,7 @@ where
     draw_progress(app, frame, main_layout_chunks[2]);
 }
 
-pub fn draw_header<B>(app: &mut App, frame: &mut Frame<B>, area: Rect)
-where
-    B: Backend,
+pub fn draw_header(app: &mut App, frame: &mut Frame, area: Rect)
 {
     let player = &app.player;
     let main_layout_chunks = Layout::default()
@@ -108,11 +103,11 @@ where
 
     frame.render_widget(text, sub_layout[0]);
     frame.render_widget(bar, sub_layout[1]);
-    let mut p = Paragraph::new(vec![Spans::from("▶(s) >>|(n) EXT(q) HLP(h)")])
+    let mut p = Paragraph::new(vec![Line::from("▶(s) >>|(n) EXT(q) HLP(h)")])
         .style(Style::default())
         .alignment(Alignment::Center);
     if player.is_playing() {
-        p = Paragraph::new(vec![Spans::from("||(s) >>|(n) EXT(q) HELP(h)")])
+        p = Paragraph::new(vec![Line::from("||(s) >>|(n) EXT(q) HELP(h)")])
             .alignment(Alignment::Center);
     }
     let blk = Block::default()

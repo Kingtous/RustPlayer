@@ -6,7 +6,6 @@ use std::{
 
 use dirs;
 use ratatui::{
-    backend::Backend,
     layout::{Alignment, Rect},
     style::{Color, Style},
     widgets::{Block, BorderType, Borders, List, ListItem, ListState},
@@ -60,9 +59,7 @@ impl RadioExplorer {
     }
 }
 
-pub fn draw_radio_list<B>(app: &mut App, frame: &mut Frame<B>, area: Rect)
-where
-    B: Backend,
+pub fn draw_radio_list(app: &mut App, frame: &mut Frame, area: Rect)
 {
     let fs = &mut app.radio_fs;
     let mut item_vec = vec![];

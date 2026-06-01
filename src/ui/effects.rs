@@ -22,7 +22,6 @@ use std::{
 
 use rand::Rng;
 use ratatui::{
-    backend::Backend,
     layout::{Alignment, Rect},
     style::{Color, Modifier, Style},
     widgets::{BarChart, Block, BorderType, Borders, List, ListItem},
@@ -42,9 +41,7 @@ lazy_static! {
     pub static ref CACHE_WAVE: Arc<RwLock<Option<WaveEffectCache>>> = Arc::new(RwLock::new(None));
 }
 
-pub fn draw_bar_charts_effect<B>(app: &mut App, frame: &mut Frame<B>, area: Rect)
-where
-    B: Backend,
+pub fn draw_bar_charts_effect(app: &mut App, frame: &mut Frame, area: Rect)
 {
     let player = &mut app.player;
     let radio = &app.radio;
